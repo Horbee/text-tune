@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   ollama:
     image: ollama/ollama
@@ -8,11 +6,11 @@ services:
       - "11434:11434"
     volumes:
       - ollama:/root/.ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: [gpu]
     # entrypoint: >
     #   /bin/sh -c "
     #   sleep 5;

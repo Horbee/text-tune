@@ -6,12 +6,13 @@ from pynput import keyboard
 from pynput.keyboard import Key, Controller
 import pyperclip
 
+from sys import platform
+
 
 controller = Controller()
 
 OLLAMA_ENDPOINT = "http://localhost:11434/api/generate"
 OLLAMA_CONFIG = {
-    # "model": "mistral:7b-instruct-v0.2-q4_K_S",
     "model": "gemma2:9b-instruct-q3_K_S",
     "keep_alive": "5m",
     "stream": False,
@@ -42,21 +43,27 @@ def fix_text(text):
 
 
 def fix_current_line():
-    # macOS short cut to select current line: Cmd+Shift+Left
-    controller.press(Key.shift)
-    controller.press(Key.home)
-    # controller.press(Key.left)
+    if platform == "darwin":
+        controller.press(Key.cmd)
+        controller.press(Key.shift)        
+        controller.press(Key.left)
 
-    controller.release(Key.shift)
-    controller.release(Key.home)
-    # controller.release(Key.left)
+        controller.release(Key.cmd)
+        controller.release(Key.shift)        
+        controller.release(Key.left)
+    else:
+        controller.press(Key.shift)
+        controller.press(Key.home)
+
+        controller.release(Key.shift)
+        controller.release(Key.home)
 
     fix_selection()
 
 
 def fix_selection():
     # 1. Copy selection to clipboard
-    with controller.pressed(Key.ctrl):
+    with controller.pressed(Key.cmd if platform == "darwin" else Key.ctrl):
         controller.tap("c")
 
     # 2. Get the clipboard string
@@ -76,7 +83,7 @@ def fix_selection():
     time.sleep(0.1)
 
     # 5. Paste the clipboard and replace the selected text
-    with controller.pressed(Key.ctrl):
+    with controller.pressed(Key.cmd if platform == "darwin" else Key.ctrl):
         controller.tap("v")
 
 
