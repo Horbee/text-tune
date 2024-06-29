@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    # entrypoint: >
+    #   /bin/sh -c "
+    #   sleep 5;
+    #   ollama run gemma2:9b-instruct-q3_K_S"
+
+  # global_keylistener:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: keylistener
+  #   depends_on:
+  #     - ollama
+
+volumes:
+  ollama:
