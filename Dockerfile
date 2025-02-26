@@ -9,7 +9,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the main.py file
-COPY main.py .
+COPY *.py .
 
 # Run the application
 CMD ["python", "main.py"]
