@@ -7,7 +7,7 @@ import pyperclip
 from sys import platform
 
 # from local_ai import fix_text
-from deepl_write import fix_text
+from python.src.deepl_fix import fix_text
 
 controller = Controller()
 

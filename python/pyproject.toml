@@ -1,0 +1,25 @@
+[project]
+name = "ai-text-fixer"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Horbee",email = "n.horox@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<4"
+dependencies = [
+    "deepl (>=1.21.1,<2.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "pynput (>=1.8.0,<2.0.0)",
+    "pyperclip (>=1.9.0,<2.0.0)",
+    "python-dotenv (>=1.0.1,<2.0.0)"
+]
+
+
+[tool.poetry]
+packages = [{include = "*", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
