@@ -1,4 +1,6 @@
 import time
+import inquirer
+
 
 from pynput import keyboard
 from pynput.keyboard import Key, Controller
@@ -6,10 +8,41 @@ import pyperclip
 
 from sys import platform
 
-# from local_ai import fix_text
-from python.src.deepl_fix import fix_text
+from local_ai import get_model_names, generate_fix_text_fn
+from deepl_fix import fix_text as deepl_fix_text
 
 controller = Controller()
+
+
+questions = [
+    inquirer.List('service',
+                  message="Which text fixing service would you like to use?",
+                  choices=['Local AI', 'DeepL'],
+                  ),
+]
+answers = inquirer.prompt(questions)
+service = answers['service']
+
+
+if service == "Local AI":
+    models = get_model_names()
+    if len(models) == 0:
+        print("No models found. Please pull a model first with ollama. For example: ollama pull llama3.2")
+        exit()
+
+    answer = inquirer.prompt([
+        inquirer.List('model',
+                      message="Which model would you like to use?",
+                      choices=models,
+                      ),
+    ])
+    model = answer['model']
+
+    print(f"Using Local AI for text fixing with model: {model}")
+    fix_text = generate_fix_text_fn(model)
+else:
+    print("Using DeepL for text fixing")
+    fix_text = deepl_fix_text
 
 
 def fix_current_line():
