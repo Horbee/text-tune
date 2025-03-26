@@ -1,6 +1,6 @@
 import time
 import inquirer
-
+from typing import Literal
 
 from pynput import keyboard
 from pynput.keyboard import Key, Controller
@@ -64,7 +64,7 @@ def fix_current_line():
     fix_selection()
 
 
-def fix_selection():
+def fix_selection(language: Literal["DE", "EN-US"] = "DE"):
     # 1. Copy selection to clipboard
     with controller.pressed(Key.cmd if platform == "darwin" else Key.ctrl):
         controller.tap("c")
@@ -79,7 +79,7 @@ def fix_selection():
         print("no text to fix")
         return
 
-    fixed_text = fix_text(text)
+    fixed_text = fix_text(text, language)
     if not fixed_text:
         print("no fixed text")
         return
@@ -94,19 +94,24 @@ def fix_selection():
         controller.tap("v")
 
 
+def on_f8():
+    print("F8 fix_selection() english")
+    fix_selection(language="EN-US")
+
+
 def on_f9():
-    print("F9 fix_current_line()")
+    print("F9 fix_current_line() german")
     fix_current_line()
 
 
 def on_f10():
-    print("F10 fix_selection()")
+    print("F10 fix_selection() english")
     fix_selection()
 
 
 print("Text fixer is started and listening...")
 try:
-    with keyboard.GlobalHotKeys({f'{Key.f9.value}': on_f9, f'{Key.f10.value}': on_f10}) as h:
+    with keyboard.GlobalHotKeys({f'{Key.f8.value}': on_f8, f'{Key.f9.value}': on_f9, f'{Key.f10.value}': on_f10}) as h:
         h.join()
 except KeyboardInterrupt:
     print("Text fixer is stopped")

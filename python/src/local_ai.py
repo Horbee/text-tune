@@ -1,4 +1,5 @@
 from string import Template
+from typing import Literal
 
 import httpx
 from timeit import default_timer as timer
@@ -20,7 +21,7 @@ PROMPT_TEMPLATE = Template(
 
 
 def generate_fix_text_fn(model: str):
-    def fix_text(text: str) -> str | None:
+    def fix_text(text: str, targetLang: Literal["DE", "EN-US"] = "DE") -> str | None:
         prompt = PROMPT_TEMPLATE.substitute(text=text)
         start = timer()
         response = httpx.post(
