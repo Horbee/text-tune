@@ -1,12 +1,12 @@
 import { Box, List, Stack, ThemeIcon, Title, Transition } from "@mantine/core";
 import { FaCheck, FaTimesCircle } from "react-icons/fa";
 
-export const Instructions = ({ apiKeySaved }: { apiKeySaved: boolean }) => {
+export const Instructions = ({ readyToFix }: { readyToFix: boolean }) => {
   return (
     <Stack gap="sm">
       <Title order={2}>How to use</Title>
 
-      <List size="lg" withPadding icon={<Icon completed={apiKeySaved} />}>
+      <List size="lg" withPadding icon={<Icon completed={readyToFix} />}>
         <List.Item pos="relative" pl={20}>
           <b>F9</b> to fix current line
         </List.Item>

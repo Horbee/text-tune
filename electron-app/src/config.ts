@@ -5,7 +5,7 @@ import path from "path";
 const configPath = path.join(app.getPath("userData"), "config.json");
 
 type AppConfig = {
-  workingMode: "deepl" | "ollama" | null;
+  workingMode: "deepl" | "ollama";
   ollamaModel: string | null;
 };
 
@@ -20,7 +20,7 @@ export function saveConfig(data: Partial<AppConfig>) {
 export function loadConfig(): AppConfig {
   if (!fs.existsSync(configPath)) {
     const initialConfig: AppConfig = {
-      workingMode: null,
+      workingMode: "deepl",
       ollamaModel: null,
     };
     return initialConfig;

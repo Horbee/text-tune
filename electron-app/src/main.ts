@@ -17,14 +17,23 @@ import {
 } from "./secure-store";
 import { keyTap } from "./robot-helper.cjs";
 import { sleep } from "./utils";
-import { fixTextFactory, FixTextFn } from "./deepl-fix";
+import { fixTextFactory as fixTextFactoryDeepl } from "./deepl-fix";
+import { fixTextFactory as fixTextFactoryOllama } from "./ollama-fix";
+import { loadConfig, saveConfig } from "./config";
+
+import type { HistoryItem, BackendState, FixTextFn } from "../electron-types";
 
 let fixText: FixTextFn | null = null;
+let backendState: BackendState = {
+  workingMode: "deepl",
+  ollamaModel: null,
+  translateHistory: [] as HistoryItem[],
+};
 
 ipcMain.handle("save-api-key", async (event, deeplApiKey: string) => {
   try {
     saveSecureConfig({ deeplApiKey });
-    fixText = fixTextFactory(deeplApiKey);
+    fixText = fixTextFactoryDeepl(deeplApiKey);
   } catch (error) {
     throw error;
   }
@@ -44,6 +53,24 @@ ipcMain.handle("check-api-key", async (event) => {
   return !!config?.deeplApiKey;
 });
 
+ipcMain.handle("get-backend-state", async (event) => {
+  return backendState;
+});
+
+ipcMain.handle(
+  "set-backend-state",
+  async (event, newState: Partial<BackendState>) => {
+    fixText = null;
+
+    backendState = { ...backendState, ...newState };
+
+    saveConfig({
+      workingMode: backendState.workingMode,
+      ollamaModel: backendState.ollamaModel,
+    });
+  }
+);
+
 // Send to specific window
 function sendToRenderer(window: BrowserWindow, message: any) {
   window.webContents.send("message-from-main", message);
@@ -62,10 +89,15 @@ if (started) {
 }
 
 const createWindow = () => {
+  // Load config, setup backend state
+  const config = loadConfig();
+  backendState.workingMode = config.workingMode;
+  backendState.ollamaModel = config.ollamaModel;
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 700,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -109,8 +141,6 @@ let tray: Tray | null = null;
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 app.whenReady().then(() => {
-  console.log(app.getAppPath());
-
   const icon = nativeImage.createFromPath(
     path.join(app.getAppPath(), "assets/trayIconTemplate@4x.png")
   );
@@ -154,17 +184,30 @@ const fixSelection = async () => {
   console.log("fixSelection");
 
   if (!fixText) {
-    const config = getSecureConfig();
-    if (!config?.deeplApiKey) {
-      broadcastToAll({
-        type: "ERROR",
-        title: "No API key found",
-        message: "Please enter a valid DeepL API key first.",
-      });
-      console.log("No DeepL API key found");
-      return;
+    if (backendState.workingMode === "deepl") {
+      const config = getSecureConfig();
+      if (!config?.deeplApiKey) {
+        broadcastToAll({
+          type: "ERROR",
+          title: "No API key found",
+          message: "Please enter a valid DeepL API key first.",
+        });
+        console.log("No DeepL API key found");
+        return;
+      }
+      fixText = fixTextFactoryDeepl(config.deeplApiKey);
+    } else if (backendState.workingMode === "ollama") {
+      if (!backendState.ollamaModel) {
+        broadcastToAll({
+          type: "ERROR",
+          title: "No model selected",
+          message: "Please select a model first.",
+        });
+        console.log("No model selected");
+        return;
+      }
+      fixText = fixTextFactoryOllama(backendState.ollamaModel);
     }
-    fixText = fixTextFactory(config.deeplApiKey);
   }
 
   const isMac = process.platform === "darwin";
@@ -185,9 +228,20 @@ const fixSelection = async () => {
 
   keyTap("v", [cmdKey]);
 
+  backendState.translateHistory.push({
+    id: backendState.translateHistory.length + 1,
+    type: "original",
+    text,
+  });
+
+  backendState.translateHistory.push({
+    id: backendState.translateHistory.length + 1,
+    type: "fix",
+    text: fixedText,
+  });
+
   broadcastToAll({
     type: "FIX_SUCCESS",
-    originalText: text,
-    fixedText,
+    historyState: backendState.translateHistory,
   });
 };

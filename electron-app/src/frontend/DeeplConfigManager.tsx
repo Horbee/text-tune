@@ -5,19 +5,23 @@ import {
   Text,
   Title,
   Alert,
+  StackProps,
 } from "@mantine/core";
 import { hasLength, useForm } from "@mantine/form";
 import { FaRegHeart } from "react-icons/fa";
 
-export const ConfigManager = ({
-  apiKeySaved,
-  saveApiKey,
-  deleteApiKey,
-}: {
+type Props = {
   apiKeySaved: boolean;
   saveApiKey: (apiKey: string) => Promise<void>;
   deleteApiKey: () => void;
-}) => {
+} & StackProps;
+
+export const DeeplConfigManager = ({
+  apiKeySaved,
+  saveApiKey,
+  deleteApiKey,
+  ...props
+}: Props) => {
   const form = useForm({
     mode: "controlled",
     initialValues: { apiKey: "" },
@@ -32,7 +36,7 @@ export const ConfigManager = ({
   };
 
   return (
-    <Stack gap="sm">
+    <Stack gap="sm" {...props}>
       <Title order={2}>Save your DeepL API Key</Title>
 
       {!apiKeySaved ? (

@@ -1,14 +1,11 @@
 import { Translator, TargetLanguageCode } from "deepl-node";
-
-export type FixTextFn = (
-  text: string,
-  targetLang?: TargetLanguageCode
-) => Promise<string>;
+import type { FixTextFn } from "electron-types";
 
 export const fixTextFactory = (apiKey: string) => {
   const translator = new Translator(apiKey);
 
   const fixText: FixTextFn = async (text, targetLang = "de") => {
+    console.log("fixing text with deepl");
     const langs = (["en-US", "de"] as TargetLanguageCode[]).filter(
       (lang) => lang !== targetLang
     );
