@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-
 import { Grid, Stack, SegmentedControl, Transition, Box } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
+
 import { DeeplConfigManager } from "./DeeplConfigManager";
 import { Instructions } from "./Instructions";
-import { FixHistory } from "./FixHistory";
-import { showNotification } from "@mantine/notifications";
+import { FixHistoryContainer } from "./FixHistoryContainer";
 import { OllamaConfigManager } from "./OllamaConfigManager";
 import { useFrontendStore } from "./stores/frontend-store";
 
@@ -95,7 +95,7 @@ function App() {
         </Stack>
       </Grid.Col>
       <Grid.Col span={7} p="lg">
-        <FixHistory />
+        <FixHistoryContainer />
       </Grid.Col>
     </Grid>
   );
