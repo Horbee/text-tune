@@ -75,12 +75,12 @@ export const useFrontendStore = create<Store>()((set) => ({
     }
   },
   setupListeners: () => {
-    window.api.receive('message-from-main', ({ type, title, message, historyState }) => {
-      if (type === 'ERROR') {
-        showErrorNotification(title, message)
+    window.api.receive('message-from-main', (args) => {
+      if (args.type === 'ERROR') {
+        showErrorNotification(args.title, args.message)
       }
-      if (type === 'FIX_SUCCESS') {
-        set({ fixHistory: historyState })
+      if (args.type === 'FIX_SUCCESS') {
+        set({ fixHistory: args.historyState })
       }
     })
   },
