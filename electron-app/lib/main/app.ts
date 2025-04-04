@@ -111,7 +111,7 @@ export function createTray(): void {
   const trayIconAssetPath =
     process.platform === 'darwin'
       ? join(app.getAppPath(), 'app/assets/trayIconTemplate@4x.png')
-      : join(app.getAppPath(), 'app/assets/trayIcon.png')
+      : join(app.getAppPath(), 'app/assets/trayIcon@4x.png')
   const icon = nativeImage.createFromPath(trayIconAssetPath)
   if (icon.isEmpty()) {
     console.error(`Failed to load tray icon: image created from path is empty. Path: ${trayIconAssetPath}`)
@@ -124,20 +124,16 @@ export function createTray(): void {
     {
       label: 'Open',
       type: 'normal',
-      click: () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-          createAppWindow()
-        } else {
-          BrowserWindow.getAllWindows()[0].show()
-        }
-      },
+      click: createOrShowWindow,
     },
     { type: 'separator' },
     { label: 'Quit', type: 'normal', click: () => app.quit() },
   ])
 
   tray.setToolTip('Text Tune')
+
   // tray.setTitle("AI Text Fixer");
+  tray.on('double-click', createOrShowWindow)
 
   tray.setContextMenu(contextMenu)
   console.log('Tray created successfully.')
@@ -185,5 +181,13 @@ export function createAppWindow(): void {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+  }
+}
+
+function createOrShowWindow() {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createAppWindow()
+  } else {
+    BrowserWindow.getAllWindows()[0].show()
   }
 }
