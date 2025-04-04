@@ -27,10 +27,14 @@ function broadcastToAll(message: any) {
 export const fixCurrentLine = async () => {
   console.log('fixCurrentLine')
   const isMac = process.platform === 'darwin'
-  const cmdKey = isMac ? Key.LeftCmd : Key.LeftControl
 
-  await keyboard.pressKey(cmdKey, Key.LeftShift, Key.Left)
-  await keyboard.releaseKey(cmdKey, Key.LeftShift, Key.Left)
+  if (isMac) {
+    await keyboard.pressKey(Key.LeftCmd, Key.LeftShift, Key.Left)
+    await keyboard.releaseKey(Key.LeftCmd, Key.LeftShift, Key.Left)
+  } else {
+    await keyboard.pressKey(Key.LeftShift, Key.Home)
+    await keyboard.releaseKey(Key.LeftShift, Key.Home)
+  }
 
   fixSelection()
 }
@@ -104,7 +108,10 @@ export const fixSelection = async () => {
 }
 
 export function createTray(): void {
-  const trayIconAssetPath = join(app.getAppPath(), 'app/assets/trayIconTemplate@4x.png')
+  const trayIconAssetPath =
+    process.platform === 'darwin'
+      ? join(app.getAppPath(), 'app/assets/trayIconTemplate@4x.png')
+      : join(app.getAppPath(), 'app/assets/trayIcon.png')
   const icon = nativeImage.createFromPath(trayIconAssetPath)
   if (icon.isEmpty()) {
     console.error(`Failed to load tray icon: image created from path is empty. Path: ${trayIconAssetPath}`)
@@ -129,8 +136,9 @@ export function createTray(): void {
     { label: 'Quit', type: 'normal', click: () => app.quit() },
   ])
 
-  // tray.setToolTip("This is my application.");
+  tray.setToolTip('Text Tune')
   // tray.setTitle("AI Text Fixer");
+
   tray.setContextMenu(contextMenu)
   console.log('Tray created successfully.')
 }
