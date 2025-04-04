@@ -111,7 +111,7 @@ export function createTray(): void {
   const trayIconAssetPath =
     process.platform === 'darwin'
       ? join(app.getAppPath(), 'app/assets/trayIconTemplate@4x.png')
-      : join(app.getAppPath(), 'app/assets/trayIcon@4x.png')
+      : join(app.getAppPath(), 'app/assets/trayIcon.png')
   const icon = nativeImage.createFromPath(trayIconAssetPath)
   if (icon.isEmpty()) {
     console.error(`Failed to load tray icon: image created from path is empty. Path: ${trayIconAssetPath}`)
