@@ -1,4 +1,4 @@
-import { BrowserWindow, shell, app, clipboard, Menu, Tray, nativeImage } from 'electron'
+import { BrowserWindow, shell, app, clipboard, Menu, Tray, nativeImage, Notification } from 'electron'
 import { join } from 'path'
 import { registerFrontendIPC } from '@/lib/frontend/ipcEvents'
 import { getSecureConfig } from '@/lib/main/secure-store'
@@ -51,6 +51,15 @@ export const fixSelection = async () => {
           title: 'No API key found',
           message: 'Please enter a valid DeepL API key first.',
         })
+        new Notification({
+          title: 'Text Tune',
+          body: 'No DeepL API key found, enter a valid key first.',
+        })
+          .on('click', () => {
+            createOrShowWindow()
+            broadcastToAll({ type: 'FOCUS_API_KEY_INPUT' })
+          })
+          .show()
         console.log('No DeepL API key found')
         return
       }
@@ -62,6 +71,15 @@ export const fixSelection = async () => {
           title: 'No model selected',
           message: 'Please select a model first.',
         })
+        new Notification({
+          title: 'Text Tune',
+          body: 'No model selected, please select a model first.',
+        })
+          .on('click', () => {
+            createOrShowWindow()
+            broadcastToAll({ type: 'FOCUS_MODEL_SELECTOR' })
+          })
+          .show()
         console.log('No model selected')
         return
       }

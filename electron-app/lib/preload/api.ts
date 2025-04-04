@@ -11,7 +11,12 @@ interface InvokeInterface {
 }
 type ListenChannel = 'message-from-main'
 interface ReceiveInterface {
-  (channel: ListenChannel, func: (args: ErrorMessageInterface | FixSuccessInterface) => void): void
+  (
+    channel: ListenChannel,
+    func: (
+      args: ErrorMessageInterface | FixSuccessInterface | FocusModelSelectorInterface | FocusApiKeyInputInterface
+    ) => void
+  ): void
 }
 
 interface ErrorMessageInterface {
@@ -23,6 +28,14 @@ interface ErrorMessageInterface {
 interface FixSuccessInterface {
   type: 'FIX_SUCCESS'
   historyState: HistoryItem[]
+}
+
+interface FocusModelSelectorInterface {
+  type: 'FOCUS_MODEL_SELECTOR'
+}
+
+interface FocusApiKeyInputInterface {
+  type: 'FOCUS_API_KEY_INPUT'
 }
 
 const api = {

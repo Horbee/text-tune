@@ -1,5 +1,6 @@
 import { Button, PasswordInput, Stack, Text, Title, Alert, StackProps } from '@mantine/core'
 import { hasLength, useForm } from '@mantine/form'
+import { useRef, useEffect } from 'react'
 import { FaRegHeart } from 'react-icons/fa'
 
 type Props = {
@@ -9,6 +10,8 @@ type Props = {
 } & StackProps
 
 export const DeeplConfigManager = ({ apiKeySaved, saveApiKey, deleteApiKey, ...props }: Props) => {
+  const apiKeyInputRef = useRef<HTMLInputElement>(null)
+
   const form = useForm({
     mode: 'controlled',
     initialValues: { apiKey: '' },
@@ -16,6 +19,14 @@ export const DeeplConfigManager = ({ apiKeySaved, saveApiKey, deleteApiKey, ...p
       apiKey: hasLength({ min: 1 }, 'Must be at least 1 character'),
     },
   })
+
+  useEffect(() => {
+    window.api.receive('message-from-main', (args) => {
+      if (args.type === 'FOCUS_API_KEY_INPUT') {
+        apiKeyInputRef.current?.focus()
+      }
+    })
+  }, [])
 
   const submit = (values: typeof form.values) => {
     saveApiKey(values.apiKey)
@@ -28,7 +39,12 @@ export const DeeplConfigManager = ({ apiKeySaved, saveApiKey, deleteApiKey, ...p
 
       {!apiKeySaved ? (
         <form onSubmit={form.onSubmit(submit)} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <PasswordInput label="API Key" placeholder="Enter your API key" {...form.getInputProps('apiKey')} />
+          <PasswordInput
+            ref={apiKeyInputRef}
+            label="API Key"
+            placeholder="Enter your API key"
+            {...form.getInputProps('apiKey')}
+          />
 
           <Button type="submit">Save</Button>
         </form>

@@ -7,6 +7,7 @@ const configPath = path.join(app.getPath('userData'), 'config.json')
 type AppConfig = {
   workingMode: 'deepl' | 'ollama'
   ollamaModel: string | null
+  backgroundNotificationShown: boolean
 }
 
 export function saveConfig(data: Partial<AppConfig>) {
@@ -22,6 +23,7 @@ export function loadConfig(): AppConfig {
     const initialConfig: AppConfig = {
       workingMode: 'deepl',
       ollamaModel: null,
+      backgroundNotificationShown: false,
     }
     return initialConfig
   }

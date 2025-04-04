@@ -1,7 +1,7 @@
-import { app, BrowserWindow, globalShortcut } from 'electron'
+import { app, BrowserWindow, globalShortcut, Notification } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { createAppWindow, createTray, fixCurrentLine, fixSelection, registerAppIPC } from './app'
-
+import { loadConfig, saveConfig } from './config'
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -34,6 +34,19 @@ app.whenReady().then(() => {
 
 // Since we want to minimize the app to the tray, we don't quit the app when all windows are closed.
 app.on('window-all-closed', () => {
+  const config = loadConfig()
+  if (!config.backgroundNotificationShown) {
+    new Notification({
+      title: 'Text Tune',
+      body: 'Text Tune is running in the background.',
+    })
+      .on('click', () => {
+        createAppWindow()
+      })
+      .show()
+
+    saveConfig({ backgroundNotificationShown: true })
+  }
   // if (process.platform !== 'darwin') {
   //   app.quit()
   // }
