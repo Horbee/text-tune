@@ -11,7 +11,7 @@ type Props = {
 
 export const OllamaConfigManager = ({ selectedModel, setSelectedModel, ...props }: Props) => {
   const [models, setModels] = useState<string[]>([])
-  const [isOllamaRunning, setIsOllamaRunning] = useState(false)
+  const [ollamaError, setOllamaError] = useState(false)
 
   const modelSelectorRef = useRef<HTMLInputElement>(null)
 
@@ -19,45 +19,48 @@ export const OllamaConfigManager = ({ selectedModel, setSelectedModel, ...props 
     // Check if ollama is running
     try {
       await axios.get('http://localhost:11434')
-      setIsOllamaRunning(true)
 
       // Get models
       const res = await axios.get('http://localhost:11434/api/tags')
       setModels(res.data.models.map((model: any) => model.name))
     } catch (error) {
-      setIsOllamaRunning(false)
+      setOllamaError(true)
     }
   }
 
   useEffect(() => {
     getOllamaData()
+  }, [])
 
-    window.api.receive('message-from-main', (args) => {
+  useEffect(() => {
+    const unsub = window.api.receive('message-from-main', (args) => {
       if (args.type === 'FOCUS_MODEL_SELECTOR') {
         modelSelectorRef.current?.focus()
       }
     })
-  }, [])
 
-  if (!isOllamaRunning) {
-    return (
-      <Alert color="orange" icon={<GoAlert />}>
-        <Text>Seems like Ollama is not running. Please start it first.</Text>
-      </Alert>
-    )
-  }
+    return () => unsub()
+  }, [])
 
   return (
     <Stack gap="sm" {...props}>
-      <Title order={2}>Select one of the available models</Title>
-      <Select ref={modelSelectorRef} data={models} value={selectedModel} onChange={setSelectedModel} clearable />
+      {ollamaError ? (
+        <Alert color="orange" icon={<GoAlert />}>
+          <Text>Seems like Ollama is not running. Please start it first.</Text>
+        </Alert>
+      ) : (
+        <>
+          <Title order={2}>Select one of the available models</Title>
+          <Select ref={modelSelectorRef} data={models} value={selectedModel} onChange={setSelectedModel} clearable />
 
-      <Alert>
-        <Text>
-          If you don't see your desired model, you can pull it: <br />
-          <Code>ollama pull llama3.2</Code>
-        </Text>
-      </Alert>
+          <Alert>
+            <Text>
+              If you don't see your desired model, you can pull it: <br />
+              <Code>ollama pull llama3.2</Code>
+            </Text>
+          </Alert>
+        </>
+      )}
     </Stack>
   )
 }

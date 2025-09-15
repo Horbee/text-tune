@@ -14,13 +14,14 @@ interface InvokeInterface {
 }
 type ListenChannel = 'message-from-main'
 interface ReceiveInterface {
-  (
-    channel: ListenChannel,
-    func: (
-      args: ErrorMessageInterface | FixSuccessInterface | FocusModelSelectorInterface | FocusApiKeyInputInterface
-    ) => void
-  ): void
+  (channel: ListenChannel, callback: (args: MessageInterfaces) => void): Function
 }
+
+export type MessageInterfaces =
+  | ErrorMessageInterface
+  | FixSuccessInterface
+  | FocusModelSelectorInterface
+  | FocusApiKeyInputInterface
 
 interface ErrorMessageInterface {
   type: 'ERROR'
@@ -45,8 +46,14 @@ const api = {
   send: (channel: string, ...args: any[]) => {
     ipcRenderer.send(channel, ...args)
   },
-  receive: (channel: string, func: (...args: any[]) => void) => {
-    ipcRenderer.on(channel, (_, ...args) => func(...args))
+  receive: (channel: string, callback: (...args: any[]) => void) => {
+    // For security reasons it is better not to send the entire event object
+    const _func = (_event: Electron.IpcRendererEvent, ...args: any[]) => callback(...args)
+
+    ipcRenderer.on(channel, _func)
+
+    // Return unsubscribe function
+    return () => ipcRenderer.removeListener(channel, _func)
   },
   invoke: (channel: string, ...args: any[]) => {
     return ipcRenderer.invoke(channel, ...args)

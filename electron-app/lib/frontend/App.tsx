@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Grid, Stack, SegmentedControl, Transition, Box } from '@mantine/core'
+import { Grid, Stack, SegmentedControl } from '@mantine/core'
 import { showNotification } from '@mantine/notifications'
 
 import { DeeplConfigManager } from './DeeplConfigManager'
@@ -8,6 +8,13 @@ import { FixHistoryContainer } from './FixHistoryContainer'
 import { OllamaConfigManager } from './OllamaConfigManager'
 import { ChatGPTConfigManager } from './ChatGPTConfigManager'
 import { useFrontendStore } from './stores/frontend-store'
+import { AnimatePresence, motion } from 'framer-motion'
+
+const MotionDeeplConfigManager = motion(DeeplConfigManager)
+const MotionOllamaConfigManager = motion(OllamaConfigManager)
+const MotionChatGPTConfigManager = motion(ChatGPTConfigManager)
+
+const MotionInstructions = motion(Instructions)
 
 export const showErrorNotification = (title: string, message: string) => {
   showNotification({
@@ -72,55 +79,48 @@ function App() {
             ]}
           />
 
-          <Box style={{ position: 'relative' }} h="250px">
-            <Transition
-              mounted={workingMode === 'deepl'}
-              transition="slide-right"
-              // enterDelay={500}
-            >
-              {(styles) => (
-                <DeeplConfigManager
-                  apiKeySaved={deeplApiKeySaved}
-                  saveApiKey={saveDeeplApiKey}
-                  deleteApiKey={deleteDeeplApiKey}
-                  style={{ ...styles, position: 'absolute' }}
-                />
-              )}
-            </Transition>
+          <AnimatePresence mode="popLayout">
+            {workingMode === 'deepl' && (
+              <MotionDeeplConfigManager
+                key="deepl-config"
+                apiKeySaved={deeplApiKeySaved}
+                saveApiKey={saveDeeplApiKey}
+                deleteApiKey={deleteDeeplApiKey}
+                initial={{ x: 300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -300, opacity: 0 }}
+              />
+            )}
 
-            <Transition
-              mounted={workingMode === 'ollama'}
-              transition="slide-left"
-              // enterDelay={500}
-            >
-              {(styles) => (
-                <OllamaConfigManager
-                  selectedModel={selectedOllamaModel}
-                  setSelectedModel={setSelectedOllamaModel}
-                  style={{ ...styles, position: 'absolute' }}
-                />
-              )}
-            </Transition>
+            {workingMode === 'ollama' && (
+              <MotionOllamaConfigManager
+                key="ollama-config"
+                selectedModel={selectedOllamaModel}
+                setSelectedModel={setSelectedOllamaModel}
+                initial={{ x: 300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -300, opacity: 0 }}
+              />
+            )}
 
-            <Transition
-              mounted={workingMode === 'chatgpt'}
-              transition="slide-left"
-              // enterDelay={500}
-            >
-              {(styles) => (
-                <ChatGPTConfigManager
-                  selectedModel={selectedOpenAIModel}
-                  setSelectedModel={setSelectedOpenAIModel}
-                  apiKeySaved={openAIApiKeySaved}
-                  saveApiKey={saveOpenAIApiKey}
-                  deleteApiKey={deleteOpenAIApiKey}
-                  style={{ ...styles, position: 'absolute' }}
-                />
-              )}
-            </Transition>
-          </Box>
+            {workingMode === 'chatgpt' && (
+              <MotionChatGPTConfigManager
+                key="chatgpt-config"
+                selectedModel={selectedOpenAIModel}
+                setSelectedModel={setSelectedOpenAIModel}
+                apiKeySaved={openAIApiKeySaved}
+                saveApiKey={saveOpenAIApiKey}
+                deleteApiKey={deleteOpenAIApiKey}
+                initial={{ x: 300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -300, opacity: 0 }}
+              />
+            )}
+          </AnimatePresence>
 
-          <Instructions readyToFix={readyToFix} />
+          <motion.div layout>
+            <MotionInstructions layout readyToFix={readyToFix} />
+          </motion.div>
         </Stack>
       </Grid.Col>
       <Grid.Col span={7} p="lg">

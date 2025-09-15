@@ -12,7 +12,7 @@ type Props = {
   deleteApiKey: () => void
 } & StackProps
 
-const CHATGPT_MODELS = ['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo']
+const CHATGPT_MODELS = ['gpt-5-nano', 'gpt-5-mini', 'gpt-5']
 
 export const ChatGPTConfigManager = ({
   selectedModel,
@@ -40,16 +40,23 @@ export const ChatGPTConfigManager = ({
 
   useEffect(() => {
     // Set default model if none selected
-    if (!selectedModel && CHATGPT_MODELS.length > 0) {
-      setSelectedModel(CHATGPT_MODELS[0]) // gpt-4o-mini as default
+    if (!selectedModel || !CHATGPT_MODELS.includes(selectedModel)) {
+      setSelectedModel(CHATGPT_MODELS[0]) // gpt-5-nano as default
     }
+  }, [selectedModel, setSelectedModel])
 
-    window.api.receive('message-from-main', (args) => {
+  useEffect(() => {
+    const unsub = window.api.receive('message-from-main', (args) => {
       if (args.type === 'FOCUS_MODEL_SELECTOR') {
         modelSelectorRef.current?.focus()
       }
+      if (args.type === 'FOCUS_API_KEY_INPUT') {
+        apiKeyInputRef.current?.focus()
+      }
     })
-  }, [selectedModel, setSelectedModel])
+
+    return () => unsub()
+  }, [])
 
   return (
     <Stack gap="sm" {...props}>

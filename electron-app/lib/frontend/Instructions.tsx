@@ -1,5 +1,6 @@
-import { Box, List, Stack, ThemeIcon, Title, Transition } from "@mantine/core";
-import { FaCheck, FaTimesCircle } from "react-icons/fa";
+import { Box, List, Stack, ThemeIcon, Title } from '@mantine/core'
+import { AnimatePresence, motion } from 'framer-motion'
+import { FaCheck, FaTimesCircle } from 'react-icons/fa'
 
 export const Instructions = ({ readyToFix }: { readyToFix: boolean }) => {
   return (
@@ -15,41 +16,38 @@ export const Instructions = ({ readyToFix }: { readyToFix: boolean }) => {
         </List.Item>
       </List>
     </Stack>
-  );
-};
+  )
+}
 
 const Icon = ({ completed }: { completed: boolean }) => {
   return (
     <Box>
-      <Transition
-        mounted={completed}
-        transition="fade-down"
-        duration={400}
-        timingFunction="ease"
-      >
-        {(styles) => (
-          <Box style={styles} pos="absolute" top={8} left={0}>
+      <AnimatePresence mode="popLayout">
+        {completed && (
+          <motion.div
+            key="completed"
+            initial={{ y: -30, scale: 0, opacity: 0 }}
+            animate={{ y: 0, scale: 1, opacity: 1 }}
+            exit={{ y: -30, scale: 0, opacity: 0 }}
+          >
             <ThemeIcon color="teal" size={24} radius="xl">
               <FaCheck size={16} />
             </ThemeIcon>
-          </Box>
+          </motion.div>
         )}
-      </Transition>
-
-      <Transition
-        mounted={!completed}
-        transition="fade-up"
-        duration={400}
-        timingFunction="ease"
-      >
-        {(styles) => (
-          <Box style={styles} pos="absolute" top={8} left={0}>
+        {!completed && (
+          <motion.div
+            key="not-completed"
+            initial={{ y: 30, scale: 0, opacity: 0 }}
+            animate={{ y: 0, scale: 1, opacity: 1 }}
+            exit={{ y: 30, scale: 0, opacity: 0 }}
+          >
             <ThemeIcon color="red" size={24} radius="xl">
               <FaTimesCircle size={16} />
             </ThemeIcon>
-          </Box>
+          </motion.div>
         )}
-      </Transition>
+      </AnimatePresence>
     </Box>
-  );
-};
+  )
+}

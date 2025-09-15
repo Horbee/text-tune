@@ -21,11 +21,13 @@ export const DeeplConfigManager = ({ apiKeySaved, saveApiKey, deleteApiKey, ...p
   })
 
   useEffect(() => {
-    window.api.receive('message-from-main', (args) => {
+    const unsub = window.api.receive('message-from-main', (args) => {
       if (args.type === 'FOCUS_API_KEY_INPUT') {
         apiKeyInputRef.current?.focus()
       }
     })
+
+    return () => unsub()
   }, [])
 
   const submit = (values: typeof form.values) => {

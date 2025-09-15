@@ -1,19 +1,16 @@
 import OpenAI from 'openai'
+import { z } from 'zod'
+import { zodTextFormat } from 'openai/helpers/zod'
 import { Notification } from 'electron'
-import type { FixTextFn } from '@/lib/main/types'
 import { createOrShowWindow } from './app'
+import type { FixTextFn } from '@/lib/main/types'
 
-const getPromptTemplate = (text: string) => {
-  return `Fix all typos and casing and punctuation in this text and make it grammatically correct, but keep the source language:
-
-  ${text}
-
-  Return only the corrected text, don't include a preamble.
-  `
-}
+const TextSchema = z.object({
+  correctedText: z.string(),
+})
 
 export const fixTextFactory = (model: string, apiKey: string) => {
-  const openai = new OpenAI({
+  const client = new OpenAI({
     apiKey: apiKey,
   })
 
@@ -21,19 +18,26 @@ export const fixTextFactory = (model: string, apiKey: string) => {
     console.log('fixing text with ChatGPT')
 
     try {
-      const response = await openai.chat.completions.create({
-        model: model,
-        messages: [
+      const response = await client.responses.parse({
+        model,
+        input: [
+          {
+            role: 'developer',
+            content:
+              "Fix all typos, casing and punctuation in the user's text. Make it grammatically correct, while keeping the source language. Return only the corrected text, don't include a preamble.",
+          },
           {
             role: 'user',
-            content: getPromptTemplate(text),
+            content: text,
           },
         ],
-        max_tokens: 1000,
-        temperature: 0.1,
+        reasoning: { effort: 'minimal' },
+        text: {
+          format: zodTextFormat(TextSchema, 'correctedText'),
+        },
       })
 
-      return response.choices[0]?.message?.content?.trim() || text
+      return response.output_parsed?.correctedText || text
     } catch (error: any) {
       console.error('Error fixing text with Ollama:', error)
 
