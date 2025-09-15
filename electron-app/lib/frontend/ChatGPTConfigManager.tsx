@@ -46,13 +46,16 @@ export const ChatGPTConfigManager = ({
   }, [selectedModel, setSelectedModel])
 
   useEffect(() => {
-    const unsub = window.api.receive('message-from-main', (args) => {
-      if (args.type === 'FOCUS_MODEL_SELECTOR') {
-        modelSelectorRef.current?.focus()
-      }
-      if (args.type === 'FOCUS_API_KEY_INPUT') {
-        apiKeyInputRef.current?.focus()
-      }
+    const unsub = window.api.receive('focus-api-key-input', () => {
+      apiKeyInputRef.current?.focus()
+    })
+
+    return () => unsub()
+  }, [])
+
+  useEffect(() => {
+    const unsub = window.api.receive('focus-model-selector', () => {
+      modelSelectorRef.current?.focus()
     })
 
     return () => unsub()

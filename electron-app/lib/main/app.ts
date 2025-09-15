@@ -1,4 +1,4 @@
-import { BrowserWindow, shell, app, clipboard, Menu, Tray, nativeImage, Notification } from 'electron'
+import { BrowserWindow, shell, app, clipboard, Menu, Tray, nativeImage } from 'electron'
 import { join } from 'path'
 import { registerFrontendIPC } from '@/lib/frontend/ipcEvents'
 import { getSecureConfig } from '@/lib/main/secure-store'
@@ -11,6 +11,12 @@ import { fixTextFactory as fixTextFactoryOpenAI } from '@/lib/main/openai-fix'
 import { loadConfig } from '@/lib/main/config'
 
 import type { HistoryItem, BackendState, FixTextFn } from './types'
+import { IPCChannel } from './ipc/channels'
+import { LogService, NotificationService } from './services'
+
+// Service singletons (lightweight)
+const logService = new LogService()
+const notificationService = new NotificationService()
 
 let fixText: FixTextFn | null = null
 let backendState: BackendState = {
@@ -20,14 +26,15 @@ let backendState: BackendState = {
   translateHistory: [] as HistoryItem[],
 }
 
-function broadcastToAll(message: any) {
-  BrowserWindow.getAllWindows().forEach((window) => {
-    window.webContents.send('message-from-main', message)
+function broadcastToAll(channel: IPCChannel, message: any) {
+  BrowserWindow.getAllWindows().forEach((w) => {
+    w.webContents.send(channel, message)
   })
 }
 
 export const fixCurrentLine = async () => {
-  console.log('fixCurrentLine')
+  logService.debug('fixCurrentLine called')
+
   const isMac = process.platform === 'darwin'
 
   if (isMac) {
@@ -42,86 +49,70 @@ export const fixCurrentLine = async () => {
 }
 
 export const fixSelection = async () => {
-  console.log('fixSelection')
+  logService.debug('fixSelection called')
 
   if (!fixText) {
     if (backendState.workingMode === 'deepl') {
       const config = getSecureConfig()
       if (!config?.deeplApiKey) {
-        broadcastToAll({
-          type: 'ERROR',
+        broadcastToAll('error', {
           title: 'No API key found',
           message: 'Please enter a valid DeepL API key first.',
         })
-        new Notification({
-          title: 'Text Tune',
-          body: 'No DeepL API key found, enter a valid key first.',
+
+        notificationService.showError('Text Tune', 'No DeepL API key found, enter a valid key first.', () => {
+          createOrShowWindow()
+          broadcastToAll('focus-api-key-input', {})
         })
-          .on('click', () => {
-            createOrShowWindow()
-            broadcastToAll({ type: 'FOCUS_API_KEY_INPUT' })
-          })
-          .show()
-        console.log('No DeepL API key found')
+
+        logService.error('No DeepL API key found')
         return
       }
       fixText = fixTextFactoryDeepl(config.deeplApiKey)
     } else if (backendState.workingMode === 'ollama') {
       if (!backendState.ollamaModel) {
-        broadcastToAll({
-          type: 'ERROR',
+        broadcastToAll('error', {
           title: 'No model selected',
           message: 'Please select a model first.',
         })
-        new Notification({
-          title: 'Text Tune',
-          body: 'No model selected, please select a model first.',
+
+        notificationService.showError('Text Tune', 'No model selected, please select a model first.', () => {
+          createOrShowWindow()
+          broadcastToAll('focus-model-selector', {})
         })
-          .on('click', () => {
-            createOrShowWindow()
-            broadcastToAll({ type: 'FOCUS_MODEL_SELECTOR' })
-          })
-          .show()
-        console.log('No model selected')
+
+        logService.error('No model selected')
         return
       }
       fixText = fixTextFactoryOllama(backendState.ollamaModel)
     } else if (backendState.workingMode === 'chatgpt') {
       const config = getSecureConfig()
       if (!config?.openaiApiKey) {
-        broadcastToAll({
-          type: 'ERROR',
+        broadcastToAll('error', {
           title: 'No API key found',
           message: 'Please enter a valid OpenAI API key first.',
         })
-        new Notification({
-          title: 'Text Tune',
-          body: 'No OpenAI API key found, enter a valid key first.',
+
+        notificationService.showError('Text Tune', 'No OpenAI API key found, enter a valid key first.', () => {
+          createOrShowWindow()
+          broadcastToAll('focus-api-key-input', {})
         })
-          .on('click', () => {
-            createOrShowWindow()
-            broadcastToAll({ type: 'FOCUS_API_KEY_INPUT' })
-          })
-          .show()
-        console.log('No OpenAI API key found')
+
+        logService.error('No OpenAI API key found')
         return
       }
       if (!backendState.openAIModel) {
-        broadcastToAll({
-          type: 'ERROR',
+        broadcastToAll('error', {
           title: 'No model selected',
           message: 'Please select a model first.',
         })
-        new Notification({
-          title: 'Text Tune',
-          body: 'No model selected, please select a model first.',
+
+        notificationService.showError('Text Tune', 'No model selected, please select a model first.', () => {
+          createOrShowWindow()
+          broadcastToAll('focus-model-selector', {})
         })
-          .on('click', () => {
-            createOrShowWindow()
-            broadcastToAll({ type: 'FOCUS_MODEL_SELECTOR' })
-          })
-          .show()
-        console.log('No model selected')
+
+        logService.error('No model selected')
         return
       }
       fixText = fixTextFactoryOpenAI(backendState.openAIModel, config.openaiApiKey)
@@ -160,8 +151,7 @@ export const fixSelection = async () => {
     text: fixedText,
   })
 
-  broadcastToAll({
-    type: 'FIX_SUCCESS',
+  broadcastToAll('fix-success', {
     historyState: backendState.translateHistory,
   })
 }

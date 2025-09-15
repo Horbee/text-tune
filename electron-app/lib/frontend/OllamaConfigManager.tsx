@@ -33,10 +33,8 @@ export const OllamaConfigManager = ({ selectedModel, setSelectedModel, ...props 
   }, [])
 
   useEffect(() => {
-    const unsub = window.api.receive('message-from-main', (args) => {
-      if (args.type === 'FOCUS_MODEL_SELECTOR') {
-        modelSelectorRef.current?.focus()
-      }
+    const unsub = window.api.receive('focus-model-selector', () => {
+      modelSelectorRef.current?.focus()
     })
 
     return () => unsub()

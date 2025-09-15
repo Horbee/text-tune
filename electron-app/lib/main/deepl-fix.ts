@@ -22,6 +22,7 @@ export const fixTextFactory = (apiKey: string) => {
     } catch (error: any) {
       console.error('Error fixing text with Ollama:', error)
 
+      // TODO: refactor notification to use NotificationService
       new Notification({
         title: 'Text Tune',
         body: error.message || 'An error occurred while fixing the text.',

@@ -114,16 +114,16 @@ export const useFrontendStore = create<Store>()((set) => ({
     }
   },
   setupListeners: () => {
-    window.api.receive('message-from-main', (args) => {
-      if (args.type === 'ERROR') {
-        showErrorNotification(args.title, args.message)
-      }
-      if (args.type === 'FIX_SUCCESS') {
-        set({ fixHistory: args.historyState })
-      }
+    window.api.receive('fix-success', (payload) => {
+      set({ fixHistory: payload.historyState })
+    })
+
+    window.api.receive('error', (payload) => {
+      showErrorNotification(payload.title, payload.message)
     })
   },
   cleanupListeners: () => {
-    window.api.removeAllListeners('message-from-main')
+    window.api.removeAllListeners('fix-success')
+    window.api.removeAllListeners('error')
   },
 }))

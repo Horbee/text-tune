@@ -36,6 +36,7 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   const config = loadConfig()
   if (!config.backgroundNotificationShown) {
+    // TODO: refactor notification to use NotificationService
     new Notification({
       title: 'Text Tune',
       body: 'Text Tune is running in the background.',

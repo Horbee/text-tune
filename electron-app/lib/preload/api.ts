@@ -1,6 +1,8 @@
 import { ipcRenderer } from 'electron'
 
-import type { BackendState, HistoryItem } from '@/lib/main/types'
+import type { BackendState } from '@/lib/main/types'
+import type { ErrorPayload, FixSuccessPayload, IPCChannel } from '@/lib/main/ipc/channels'
+import { IPC_CHANNELS } from '@/lib/main/ipc/channels'
 
 interface InvokeInterface {
   (channel: 'save-deepl-api-key', apiKey: string): Promise<void>
@@ -12,41 +14,19 @@ interface InvokeInterface {
   (channel: 'get-backend-state'): Promise<BackendState>
   (channel: 'set-backend-state', state: Partial<BackendState>): Promise<void>
 }
-type ListenChannel = 'message-from-main'
+
 interface ReceiveInterface {
-  (channel: ListenChannel, callback: (args: MessageInterfaces) => void): Function
-}
-
-export type MessageInterfaces =
-  | ErrorMessageInterface
-  | FixSuccessInterface
-  | FocusModelSelectorInterface
-  | FocusApiKeyInputInterface
-
-interface ErrorMessageInterface {
-  type: 'ERROR'
-  title: string
-  message: string
-}
-
-interface FixSuccessInterface {
-  type: 'FIX_SUCCESS'
-  historyState: HistoryItem[]
-}
-
-interface FocusModelSelectorInterface {
-  type: 'FOCUS_MODEL_SELECTOR'
-}
-
-interface FocusApiKeyInputInterface {
-  type: 'FOCUS_API_KEY_INPUT'
+  (channel: typeof IPC_CHANNELS.fixSuccess, callback: (args: FixSuccessPayload) => void): Function
+  (channel: typeof IPC_CHANNELS.error, callback: (args: ErrorPayload) => void): Function
+  (channel: typeof IPC_CHANNELS.focusApiKeyInput, callback: () => void): Function
+  (channel: typeof IPC_CHANNELS.focusModelSelector, callback: () => void): Function
 }
 
 const api = {
   send: (channel: string, ...args: any[]) => {
     ipcRenderer.send(channel, ...args)
   },
-  receive: (channel: string, callback: (...args: any[]) => void) => {
+  receive: (channel: IPCChannel, callback: (...args: any[]) => void) => {
     // For security reasons it is better not to send the entire event object
     const _func = (_event: Electron.IpcRendererEvent, ...args: any[]) => callback(...args)
 
@@ -58,14 +38,14 @@ const api = {
   invoke: (channel: string, ...args: any[]) => {
     return ipcRenderer.invoke(channel, ...args)
   },
-  removeAllListeners: (channel: string) => {
+  removeAllListeners: (channel: IPCChannel) => {
     ipcRenderer.removeAllListeners(channel)
   },
 } as {
   send: (channel: string, ...args: any[]) => void
   receive: ReceiveInterface
   invoke: InvokeInterface
-  removeAllListeners: (channel: ListenChannel) => void
+  removeAllListeners: (channel: IPCChannel) => void
 }
 
 export default api
