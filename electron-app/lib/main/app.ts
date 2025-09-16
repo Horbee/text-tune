@@ -1,30 +1,19 @@
-import { BrowserWindow, shell, app, clipboard, Menu, Tray, nativeImage } from 'electron'
+import { BrowserWindow, shell, app, Menu, Tray, nativeImage } from 'electron'
 import { join } from 'path'
 import { registerFrontendIPC } from '@/lib/frontend/ipcEvents'
-import { getSecureConfig } from '@/lib/main/secure-store'
 import appIcon from '@/resources/build/icon.png?asset'
-import { keyboard, Key } from '@nut-tree-fork/nut-js'
-import { sleep } from '@/lib/main/utils'
-import { fixTextFactory as fixTextFactoryDeepl } from '@/lib/main/deepl-fix'
-import { fixTextFactory as fixTextFactoryOllama } from '@/lib/main/ollama-fix'
-import { fixTextFactory as fixTextFactoryOpenAI } from '@/lib/main/openai-fix'
-import { loadConfig } from '@/lib/main/config'
 
-import type { HistoryItem, BackendState, FixTextFn } from './types'
 import { IPCChannel } from './ipc/channels'
-import { LogService, NotificationService } from './services'
+import { LogService, NotificationService, ClipboardService, ConfigService, ErrorHandler, FixService } from './services'
+import { DeepLProvider, OllamaProvider, OpenAIProvider } from './providers'
 
 // Service singletons (lightweight)
-const logService = new LogService()
-const notificationService = new NotificationService()
-
-let fixText: FixTextFn | null = null
-let backendState: BackendState = {
-  workingMode: 'deepl',
-  ollamaModel: null,
-  openAIModel: null,
-  translateHistory: [] as HistoryItem[],
-}
+let logService: LogService
+let notificationService: NotificationService
+let clipboardService: ClipboardService
+let configService: ConfigService
+let fixService: FixService
+let errorHandler: ErrorHandler
 
 function broadcastToAll(channel: IPCChannel, message: any) {
   BrowserWindow.getAllWindows().forEach((w) => {
@@ -35,15 +24,7 @@ function broadcastToAll(channel: IPCChannel, message: any) {
 export const fixCurrentLine = async () => {
   logService.debug('fixCurrentLine called')
 
-  const isMac = process.platform === 'darwin'
-
-  if (isMac) {
-    await keyboard.pressKey(Key.LeftCmd, Key.LeftShift, Key.Left)
-    await keyboard.releaseKey(Key.LeftCmd, Key.LeftShift, Key.Left)
-  } else {
-    await keyboard.pressKey(Key.LeftShift, Key.Home)
-    await keyboard.releaseKey(Key.LeftShift, Key.Home)
-  }
+  await clipboardService.selectCurrentLine()
 
   fixSelection()
 }
@@ -51,109 +32,16 @@ export const fixCurrentLine = async () => {
 export const fixSelection = async () => {
   logService.debug('fixSelection called')
 
-  if (!fixText) {
-    if (backendState.workingMode === 'deepl') {
-      const config = getSecureConfig()
-      if (!config?.deeplApiKey) {
-        broadcastToAll('error', {
-          title: 'No API key found',
-          message: 'Please enter a valid DeepL API key first.',
-        })
+  try {
+    const original = await clipboardService.captureSelection()
+    const result = await fixService.fix(original)
 
-        notificationService.showError('Text Tune', 'No DeepL API key found, enter a valid key first.', () => {
-          createOrShowWindow()
-          broadcastToAll('focus-api-key-input', {})
-        })
-
-        logService.error('No DeepL API key found')
-        return
-      }
-      fixText = fixTextFactoryDeepl(config.deeplApiKey)
-    } else if (backendState.workingMode === 'ollama') {
-      if (!backendState.ollamaModel) {
-        broadcastToAll('error', {
-          title: 'No model selected',
-          message: 'Please select a model first.',
-        })
-
-        notificationService.showError('Text Tune', 'No model selected, please select a model first.', () => {
-          createOrShowWindow()
-          broadcastToAll('focus-model-selector', {})
-        })
-
-        logService.error('No model selected')
-        return
-      }
-      fixText = fixTextFactoryOllama(backendState.ollamaModel)
-    } else if (backendState.workingMode === 'chatgpt') {
-      const config = getSecureConfig()
-      if (!config?.openaiApiKey) {
-        broadcastToAll('error', {
-          title: 'No API key found',
-          message: 'Please enter a valid OpenAI API key first.',
-        })
-
-        notificationService.showError('Text Tune', 'No OpenAI API key found, enter a valid key first.', () => {
-          createOrShowWindow()
-          broadcastToAll('focus-api-key-input', {})
-        })
-
-        logService.error('No OpenAI API key found')
-        return
-      }
-      if (!backendState.openAIModel) {
-        broadcastToAll('error', {
-          title: 'No model selected',
-          message: 'Please select a model first.',
-        })
-
-        notificationService.showError('Text Tune', 'No model selected, please select a model first.', () => {
-          createOrShowWindow()
-          broadcastToAll('focus-model-selector', {})
-        })
-
-        logService.error('No model selected')
-        return
-      }
-      fixText = fixTextFactoryOpenAI(backendState.openAIModel, config.openaiApiKey)
-    }
+    await clipboardService.replaceSelection(result.fixed)
+    broadcastToAll('fix-success', { historyState: result.history })
+  } catch (err: any) {
+    errorHandler.general('fixSelection', err)
+    broadcastToAll('error', { title: 'Fix Failed', message: err?.message || 'Unknown error' })
   }
-
-  const isMac = process.platform === 'darwin'
-  const cmdKey = isMac ? Key.LeftCmd : Key.LeftControl
-
-  await keyboard.pressKey(cmdKey, Key.C)
-  await keyboard.releaseKey(cmdKey, Key.C)
-
-  await sleep(100)
-
-  const text = clipboard.readText()
-  console.log('Original text:', text)
-
-  const fixedText = (await fixText?.(text)) || ''
-  console.log('Fixed text:', fixedText)
-
-  clipboard.writeText(fixedText)
-  await sleep(100)
-
-  await keyboard.pressKey(cmdKey, Key.V)
-  await keyboard.releaseKey(cmdKey, Key.V)
-
-  backendState.translateHistory.push({
-    id: backendState.translateHistory.length + 1,
-    type: 'original',
-    text,
-  })
-
-  backendState.translateHistory.push({
-    id: backendState.translateHistory.length + 1,
-    type: 'fix',
-    text: fixedText,
-  })
-
-  broadcastToAll('fix-success', {
-    historyState: backendState.translateHistory,
-  })
 }
 
 export function createTray(): void {
@@ -189,19 +77,41 @@ export function createTray(): void {
 }
 
 export function registerAppIPC(): void {
-  // Register IPC events for the Frontend
-  registerFrontendIPC((newFixText) => {
-    fixText = newFixText
-  }, backendState)
+  // Register IPC events for the Frontend (now using services)
+  registerFrontendIPC(configService, fixService)
+}
+
+export function getConfigService() {
+  return configService
+}
+
+export function initServices(): void {
+  // Initialize services
+  logService = new LogService()
+  notificationService = new NotificationService()
+  clipboardService = new ClipboardService()
+  configService = new ConfigService()
+  errorHandler = new ErrorHandler(notificationService, logService)
+  fixService = new FixService(configService.getWorkingMode())
+
+  logService.info('Services initialized')
+
+  // Register providers
+  fixService.registerProvider(new DeepLProvider(() => configService.getDeepLApiKey(), notificationService, logService))
+  fixService.registerProvider(new OllamaProvider(() => configService.getOllamaModel(), notificationService, logService))
+  fixService.registerProvider(
+    new OpenAIProvider(
+      () => configService.getOpenAIModel(),
+      () => configService.getOpenAIKey(),
+      notificationService,
+      logService
+    )
+  )
+
+  logService.info('Providers registered')
 }
 
 export function createAppWindow(): void {
-  // Load config, setup backend state
-  const config = loadConfig()
-  backendState.workingMode = config.workingMode
-  backendState.ollamaModel = config.ollamaModel
-  backendState.openAIModel = config.openAIModel
-
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 700,

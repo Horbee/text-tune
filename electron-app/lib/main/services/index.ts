@@ -1,2 +1,6 @@
 export * from './LogService'
 export * from './NotificationService'
+export * from './ClipboardService'
+export * from './ConfigService'
+export * from './ErrorHandler'
+export * from './FixService'

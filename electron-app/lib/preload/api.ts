@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 
-import type { BackendState } from '@/lib/main/types'
+import type { BackendState, WorkingMode } from '@/lib/main/types'
 import type { ErrorPayload, FixSuccessPayload, IPCChannel } from '@/lib/main/ipc/channels'
 import { IPC_CHANNELS } from '@/lib/main/ipc/channels'
 
@@ -12,7 +12,9 @@ interface InvokeInterface {
   (channel: 'delete-openai-api-key'): Promise<void>
   (channel: 'check-openai-api-key'): Promise<boolean>
   (channel: 'get-backend-state'): Promise<BackendState>
-  (channel: 'set-backend-state', state: Partial<BackendState>): Promise<void>
+  (channel: 'set-working-mode', mode: WorkingMode): Promise<void>
+  (channel: 'set-ollama-model', model: string | null): Promise<void>
+  (channel: 'set-openai-model', model: string | null): Promise<void>
 }
 
 interface ReceiveInterface {

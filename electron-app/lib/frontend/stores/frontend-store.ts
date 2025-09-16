@@ -56,7 +56,7 @@ export const useFrontendStore = create<Store>()((set) => ({
 
   setSelectedOllamaModel: async (model) => {
     try {
-      await window.api.invoke('set-backend-state', { ollamaModel: model })
+      await window.api.invoke('set-ollama-model', model)
       set({ selectedOllamaModel: model, ollamaModelSelected: !!model })
     } catch (error) {
       showErrorNotification('Ollama model was not set!', 'Please try again.')
@@ -65,7 +65,7 @@ export const useFrontendStore = create<Store>()((set) => ({
   setWorkingMode: async (mode) => {
     console.log(mode)
     try {
-      await window.api.invoke('set-backend-state', { workingMode: mode })
+      await window.api.invoke('set-working-mode', mode)
       set({ workingMode: mode })
     } catch (error) {
       showErrorNotification('Working mode was not set!', 'Please try again.')
@@ -90,7 +90,7 @@ export const useFrontendStore = create<Store>()((set) => ({
   },
   setSelectedOpenAIModel: async (model) => {
     try {
-      await window.api.invoke('set-backend-state', { openAIModel: model })
+      await window.api.invoke('set-openai-model', model)
       set({ selectedOpenAIModel: model })
     } catch (error) {
       showErrorNotification('OpenAI model was not set!', 'Please try again.')

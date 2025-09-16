@@ -1,0 +1,7 @@
+Loading state
+Time to fix
+Effort control for GPT-5?
+Edit prompt feature
+Better UI?
+New Icon?
+Refactoring backend code?

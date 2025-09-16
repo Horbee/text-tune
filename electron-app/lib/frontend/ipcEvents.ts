@@ -1,20 +1,17 @@
 import { ipcMain } from 'electron'
-import { saveSecureConfig, deleteSecureConfig, getSecureConfig } from '@/lib/main/secure-store'
-import { fixTextFactory as fixTextFactoryDeepl } from '@/lib/main/deepl-fix'
-import { saveConfig } from '@/lib/main/config'
-
-import type { BackendState, FixTextFn } from '@/lib/main/types'
+import { ConfigService } from '@/lib//main/services'
+import type { FixService } from '@/lib/main/services'
+import { WorkingMode } from '../main/types'
 
 const handleIPC = (channel: string, handler: (...args: any[]) => void) => {
   ipcMain.handle(channel, handler)
 }
 
-export const registerFrontendIPC = (setFixText: (fixText: FixTextFn | null) => void, backendState: BackendState) => {
+export const registerFrontendIPC = (configService: ConfigService, fixService: FixService) => {
   // DeepL Text Handlers
   handleIPC('save-deepl-api-key', (_e, deeplApiKey: string) => {
     try {
-      saveSecureConfig({ deeplApiKey })
-      setFixText(fixTextFactoryDeepl(deeplApiKey))
+      configService.setDeepLApiKey(deeplApiKey)
     } catch (error) {
       throw error
     }
@@ -22,23 +19,20 @@ export const registerFrontendIPC = (setFixText: (fixText: FixTextFn | null) => v
 
   handleIPC('delete-deepl-api-key', async () => {
     try {
-      deleteSecureConfig('deeplApiKey')
-      setFixText(null)
+      configService.setDeepLApiKey(null)
     } catch (error) {
       throw error
     }
   })
 
   handleIPC('check-deepl-api-key', async () => {
-    const config = getSecureConfig()
-    return !!config?.deeplApiKey
+    return !!configService.getDeepLApiKey()
   })
 
   // OpenAI API Key Handlers
   handleIPC('save-openai-api-key', (_e, openaiApiKey: string) => {
     try {
-      saveSecureConfig({ openaiApiKey })
-      setFixText(fixTextFactoryDeepl(openaiApiKey))
+      configService.setOpenAIKey(openaiApiKey)
     } catch (error) {
       throw error
     }
@@ -46,29 +40,33 @@ export const registerFrontendIPC = (setFixText: (fixText: FixTextFn | null) => v
 
   handleIPC('delete-openai-api-key', async () => {
     try {
-      deleteSecureConfig('openaiApiKey')
-      setFixText(null)
+      configService.setOpenAIKey(null)
     } catch (error) {
       throw error
     }
   })
 
   handleIPC('check-openai-api-key', async () => {
-    const config = getSecureConfig()
-    return !!config?.openaiApiKey
+    return !!configService.getOpenAIKey()
   })
 
-  handleIPC('get-backend-state', () => backendState)
+  handleIPC('get-backend-state', () => ({
+    workingMode: configService.getWorkingMode(),
+    ollamaModel: configService.getOllamaModel(),
+    openAIModel: configService.getOpenAIModel(),
+    translateHistory: fixService.getHistory(),
+  }))
 
-  handleIPC('set-backend-state', async (_e, newState: Partial<BackendState>) => {
-    setFixText(null)
+  handleIPC('set-working-mode', async (_e, mode: WorkingMode) => {
+    configService.setWorkingMode(mode)
+    fixService.setMode(mode)
+  })
 
-    Object.assign(backendState, newState)
+  handleIPC('set-ollama-model', async (_e, model: string | null) => {
+    configService.setOllamaModel(model)
+  })
 
-    saveConfig({
-      workingMode: backendState.workingMode,
-      ollamaModel: backendState.ollamaModel,
-      openAIModel: backendState.openAIModel,
-    })
+  handleIPC('set-openai-model', async (_e, model: string | null) => {
+    configService.setOpenAIModel(model)
   })
 }

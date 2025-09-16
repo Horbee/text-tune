@@ -1,7 +1,14 @@
 import { app, BrowserWindow, globalShortcut, Notification } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { createAppWindow, createTray, fixCurrentLine, fixSelection, registerAppIPC } from './app'
-import { loadConfig, saveConfig } from './config'
+import {
+  createAppWindow,
+  createTray,
+  fixCurrentLine,
+  fixSelection,
+  initServices,
+  registerAppIPC,
+  getConfigService,
+} from './app'
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -9,8 +16,10 @@ app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.horbee.text-tune')
 
-  registerAppIPC()
+  // Init services
+  initServices()
 
+  registerAppIPC()
   // Create app window
   createAppWindow()
   createTray()
@@ -34,8 +43,8 @@ app.whenReady().then(() => {
 
 // Since we want to minimize the app to the tray, we don't quit the app when all windows are closed.
 app.on('window-all-closed', () => {
-  const config = loadConfig()
-  if (!config.backgroundNotificationShown) {
+  const configService = getConfigService()
+  if (!configService.isBackgroundNotificationShown()) {
     // TODO: refactor notification to use NotificationService
     new Notification({
       title: 'Text Tune',
@@ -46,7 +55,7 @@ app.on('window-all-closed', () => {
       })
       .show()
 
-    saveConfig({ backgroundNotificationShown: true })
+    configService.setBackgroundNotificationShown(true)
   }
   // if (process.platform !== 'darwin') {
   //   app.quit()
