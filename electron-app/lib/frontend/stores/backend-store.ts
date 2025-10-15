@@ -26,7 +26,7 @@ type Store = {
   deleteDeeplApiKey: () => Promise<void>
 }
 
-export const useFrontendStore = create<Store>()((set) => ({
+export const useBackendStore = create<Store>()((set) => ({
   deeplApiKeySaved: false,
   openAIApiKeySaved: false,
   ollamaModelSelected: false,

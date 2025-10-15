@@ -1,20 +1,14 @@
 import { useEffect } from 'react'
-import { Grid, Stack, SegmentedControl } from '@mantine/core'
+import { Drawer, Grid, Group, Stack, Title } from '@mantine/core'
 import { showNotification } from '@mantine/notifications'
+import { motion } from 'motion/react'
 
-import { DeeplConfigManager } from './DeeplConfigManager'
-import { Instructions } from './Instructions'
-import { FixHistoryContainer } from './FixHistoryContainer'
-import { OllamaConfigManager } from './OllamaConfigManager'
-import { ChatGPTConfigManager } from './ChatGPTConfigManager'
-import { useFrontendStore } from './stores/frontend-store'
-import { AnimatePresence, motion } from 'framer-motion'
+import { Instructions, FixHistoryContainer, Header, ServiceCards } from '@/lib/frontend/components'
+import { useBackendStore } from '@/lib/frontend/stores/backend-store'
+import { useDrawerStore } from '@/lib/frontend/stores/drawer-store'
+import { MdOutlineAutoAwesome } from 'react-icons/md'
 
-const MotionDeeplConfigManager = motion(DeeplConfigManager)
-const MotionOllamaConfigManager = motion(OllamaConfigManager)
-const MotionChatGPTConfigManager = motion(ChatGPTConfigManager)
-
-const MotionInstructions = motion(Instructions)
+const MotionInstructions = motion.create(Instructions)
 
 export const showErrorNotification = (title: string, message: string) => {
   showNotification({
@@ -27,28 +21,8 @@ export const showErrorNotification = (title: string, message: string) => {
 }
 
 function App() {
-  const {
-    initStore,
-    workingMode,
-    setWorkingMode,
-    setupListeners,
-    cleanupListeners,
-    // Configs
-    deeplApiKeySaved,
-    ollamaModelSelected,
-    openAIApiKeySaved,
-    // Ollama
-    selectedOllamaModel,
-    setSelectedOllamaModel,
-    // OpenAI
-    selectedOpenAIModel,
-    setSelectedOpenAIModel,
-    saveOpenAIApiKey,
-    deleteOpenAIApiKey,
-    // DeepL
-    saveDeeplApiKey,
-    deleteDeeplApiKey,
-  } = useFrontendStore()
+  const { initStore, setupListeners, cleanupListeners } = useBackendStore()
+  const { drawerOpen, setDrawerOpen } = useDrawerStore()
 
   useEffect(() => {
     initStore()
@@ -60,73 +34,50 @@ function App() {
     }
   }, [])
 
-  const readyToFix =
-    (workingMode === 'deepl' && deeplApiKeySaved) ||
-    (workingMode === 'ollama' && ollamaModelSelected) ||
-    (workingMode === 'chatgpt' && openAIApiKeySaved)
-
   return (
-    <Grid p="lg">
-      <Grid.Col span={5} p="lg">
-        <Stack gap="xl">
-          <SegmentedControl
-            value={workingMode}
-            onChange={(value) => setWorkingMode(value as 'deepl' | 'ollama')}
-            data={[
-              { label: 'DeepL', value: 'deepl' },
-              { label: 'Ollama', value: 'ollama' },
-              { label: 'ChatGPT', value: 'chatgpt' },
-            ]}
-          />
+    <>
+      <Header />
+      <Grid gutter={0}>
+        <Grid.Col span={{ base: 12, md: 8 }} p="lg">
+          <Stack>
+            <ServiceCards />
 
-          <AnimatePresence mode="popLayout">
-            {workingMode === 'deepl' && (
-              <MotionDeeplConfigManager
-                key="deepl-config"
-                apiKeySaved={deeplApiKeySaved}
-                saveApiKey={saveDeeplApiKey}
-                deleteApiKey={deleteDeeplApiKey}
-                initial={{ x: 300, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -300, opacity: 0 }}
-              />
-            )}
-
-            {workingMode === 'ollama' && (
-              <MotionOllamaConfigManager
-                key="ollama-config"
-                selectedModel={selectedOllamaModel}
-                setSelectedModel={setSelectedOllamaModel}
-                initial={{ x: 300, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -300, opacity: 0 }}
-              />
-            )}
-
-            {workingMode === 'chatgpt' && (
-              <MotionChatGPTConfigManager
-                key="chatgpt-config"
-                selectedModel={selectedOpenAIModel}
-                setSelectedModel={setSelectedOpenAIModel}
-                apiKeySaved={openAIApiKeySaved}
-                saveApiKey={saveOpenAIApiKey}
-                deleteApiKey={deleteOpenAIApiKey}
-                initial={{ x: 300, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -300, opacity: 0 }}
-              />
-            )}
-          </AnimatePresence>
-
-          <motion.div layout>
-            <MotionInstructions layout readyToFix={readyToFix} />
-          </motion.div>
-        </Stack>
-      </Grid.Col>
-      <Grid.Col span={7} p="lg">
-        <FixHistoryContainer />
-      </Grid.Col>
-    </Grid>
+            <motion.div layout>
+              <MotionInstructions layout />
+            </motion.div>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col
+          display={{ base: 'none', md: 'block' }}
+          span={4}
+          p="lg"
+          pr="0"
+          h="calc(100vh - 77px)"
+          style={(theme) => ({
+            borderLeft: `1px solid ${theme.colors.gray[8]}`,
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+            backdropFilter: 'blur(8px)',
+          })}
+        >
+          <FixHistoryContainer />
+        </Grid.Col>
+      </Grid>
+      <Drawer
+        display={{ base: 'block', md: 'none' }}
+        opened={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        position="right"
+        size="sm"
+        title={
+          <Group gap="xs">
+            <MdOutlineAutoAwesome size={24} color="#eee" />
+            <Title order={3}>History</Title>
+          </Group>
+        }
+      >
+        <FixHistoryContainer hideTitle />
+      </Drawer>
+    </>
   )
 }
 

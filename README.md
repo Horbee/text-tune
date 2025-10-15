@@ -59,3 +59,13 @@ TextTune is a utility that allows you to easily translate and fix text using the
 ## License
 
 [MIT](LICENSE)
+
+Permissions cache needs a reset
+
+Sometimes the TCC (Transparency, Consent, and Control) database gets stuck. You can reset accessibility permissions with:
+
+```bash
+tccutil reset Accessibility
+```
+
+⚠️ This clears permissions for all apps, so you’ll need to re-grant them.

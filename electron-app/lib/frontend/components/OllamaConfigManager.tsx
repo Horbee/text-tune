@@ -1,8 +1,7 @@
 import { Alert, Select, Stack, Title, Text, Code, type StackProps } from '@mantine/core'
-import axios from 'axios'
-import { useRef, useState } from 'react'
-import { useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { GoAlert } from 'react-icons/go'
+import axios from 'axios'
 
 type Props = {
   selectedModel: string | null
@@ -48,7 +47,7 @@ export const OllamaConfigManager = ({ selectedModel, setSelectedModel, ...props 
         </Alert>
       ) : (
         <>
-          <Title order={2}>Select one of the available models</Title>
+          <Title order={3}>Select one of the available models</Title>
           <Select ref={modelSelectorRef} data={models} value={selectedModel} onChange={setSelectedModel} clearable />
 
           <Alert>

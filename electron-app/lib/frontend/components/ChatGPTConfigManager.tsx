@@ -1,8 +1,20 @@
-import { Alert, Select, Stack, Title, Text, type StackProps, PasswordInput, Button } from '@mantine/core'
+import {
+  Select,
+  Stack,
+  Title,
+  Text,
+  type StackProps,
+  PasswordInput,
+  Button,
+  Flex,
+  Paper,
+  ActionIcon,
+  Group,
+} from '@mantine/core'
 import { hasLength, useForm } from '@mantine/form'
-import { useRef } from 'react'
-import { useEffect } from 'react'
-import { FaRegHeart } from 'react-icons/fa'
+import { useRef, useEffect } from 'react'
+import { FaTrashAlt, FaCheck } from 'react-icons/fa'
+import { IoMdCheckmarkCircleOutline } from 'react-icons/io'
 
 type Props = {
   selectedModel: string | null
@@ -63,7 +75,7 @@ export const ChatGPTConfigManager = ({
 
   return (
     <Stack gap="sm" {...props}>
-      <Title order={2}>ChatGPT Configuration</Title>
+      <Title order={3}>ChatGPT Configuration</Title>
 
       {apiKeySaved && (
         <Select
@@ -78,22 +90,44 @@ export const ChatGPTConfigManager = ({
 
       {!apiKeySaved ? (
         <form onSubmit={form.onSubmit(submit)} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <PasswordInput
-            ref={apiKeyInputRef}
-            label="API Key"
-            placeholder="Enter your API key"
-            {...form.getInputProps('apiKey')}
-          />
+          <Group align="end" gap="xs">
+            <PasswordInput
+              ref={apiKeyInputRef}
+              label="API Key"
+              placeholder="Enter your API key"
+              flex="1"
+              {...form.getInputProps('apiKey')}
+            />
 
-          <Button type="submit">Save</Button>
+            <ActionIcon type="submit" size="36">
+              <FaCheck />
+            </ActionIcon>
+          </Group>
         </form>
       ) : (
-        <Alert variant="light" color="green" title="Your API Key is saved" icon={<FaRegHeart />}>
-          <Text>You can now select a model and use the extension.</Text>
-          <Button mt={5} variant="outline" size="compact-sm" color="red" onClick={deleteApiKey}>
-            Delete API Key
-          </Button>
-        </Alert>
+        <Paper bg="var(--mantine-color-green-light)" p="md" withBorder bd="1px solid green.9">
+          <Flex gap="md" align="center" wrap="wrap">
+            <IoMdCheckmarkCircleOutline size={24} color="var(--mantine-color-green-6)" />
+            <Stack gap="0">
+              <Text fw={700} c="green.3">
+                Your API Key is saved
+              </Text>
+              <Text c="green.6" size="sm">
+                You can now select a model and use the extension.
+              </Text>
+            </Stack>
+            <Button
+              variant="outline"
+              size="compact-sm"
+              color="red"
+              ml="auto"
+              onClick={deleteApiKey}
+              leftSection={<FaTrashAlt />}
+            >
+              Delete API Key
+            </Button>
+          </Flex>
+        </Paper>
       )}
     </Stack>
   )

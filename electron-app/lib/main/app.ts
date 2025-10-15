@@ -112,9 +112,12 @@ export function initServices(): void {
 }
 
 export function createAppWindow(): void {
+  const width = configService.getLastWindowSize()?.width || 1020
+  const height = configService.getLastWindowSize()?.height || 700
+
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 700,
+    width: width,
+    height: height,
     show: false,
     icon: appIcon,
     title: 'Text Tune',
@@ -127,6 +130,11 @@ export function createAppWindow(): void {
   // Avoid showing the window before it's ready. (flashing effect)
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+  })
+
+  mainWindow.on('resized', () => {
+    const [width, height] = mainWindow.getSize()
+    configService.setLastWindowSize({ width, height })
   })
 
   // Open links in the default browser, rather than in the app.

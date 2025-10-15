@@ -1,18 +1,29 @@
-import { Box, List, Stack, ThemeIcon, Title } from '@mantine/core'
-import { AnimatePresence, motion } from 'framer-motion'
-import { FaCheck, FaTimesCircle } from 'react-icons/fa'
+import { Box, Group, Kbd, List, Stack, ThemeIcon, Title } from '@mantine/core'
+import { AnimatePresence, motion } from 'motion/react'
+import { FaCheck, FaTimesCircle, FaKeyboard } from 'react-icons/fa'
+import { useBackendStore } from '@/lib/frontend/stores/backend-store'
 
-export const Instructions = ({ readyToFix }: { readyToFix: boolean }) => {
+export const Instructions = () => {
+  const { workingMode, deeplApiKeySaved, ollamaModelSelected, openAIApiKeySaved } = useBackendStore()
+
+  const readyToFix =
+    (workingMode === 'deepl' && deeplApiKeySaved) ||
+    (workingMode === 'ollama' && ollamaModelSelected) ||
+    (workingMode === 'chatgpt' && openAIApiKeySaved)
+
   return (
     <Stack gap="sm">
-      <Title order={2}>How to use</Title>
+      <Group gap="xs">
+        <FaKeyboard size={24} color="#eee" />
+        <Title order={3}>How to use</Title>
+      </Group>
 
       <List size="lg" withPadding icon={<Icon completed={readyToFix} />}>
         <List.Item pos="relative" pl={20}>
-          <b>F9</b> to fix current line
+          <Kbd size="md">F9</Kbd> to fix current line
         </List.Item>
         <List.Item pos="relative" pl={20}>
-          <b>F10</b> to fix selection
+          <Kbd size="md">F10</Kbd> to fix selection
         </List.Item>
       </List>
     </Stack>

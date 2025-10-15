@@ -9,6 +9,7 @@ export class ConfigService {
   private backgroundNotificationShown: boolean
   private deeplApiKey: string | null
   private openaiApiKey: string | null
+  private lastWindowSize: { width: number; height: number } | null
 
   private readonly regularHelper: RegularConfigHelper
   private readonly secureHelper: SecureConfigHelper
@@ -24,6 +25,7 @@ export class ConfigService {
     this.ollamaModel = cfg.ollamaModel
     this.openAIModel = cfg.openAIModel
     this.backgroundNotificationShown = cfg.backgroundNotificationShown
+    this.lastWindowSize = cfg.lastWindowSize || null
     this.deeplApiKey = secure?.deeplApiKey || null
     this.openaiApiKey = secure?.openaiApiKey || null
   }
@@ -77,6 +79,14 @@ export class ConfigService {
     this.saveRegular()
   }
 
+  getLastWindowSize() {
+    return this.lastWindowSize
+  }
+  setLastWindowSize(size: { width: number; height: number } | null) {
+    this.lastWindowSize = size
+    this.saveRegular()
+  }
+
   private saveRegular() {
     console.log('[ConfigService] Saving regular configuration')
 
@@ -85,6 +95,7 @@ export class ConfigService {
       ollamaModel: this.ollamaModel,
       openAIModel: this.openAIModel,
       backgroundNotificationShown: this.backgroundNotificationShown,
+      lastWindowSize: this.lastWindowSize,
     }
 
     this.regularHelper.save(regularConfig)

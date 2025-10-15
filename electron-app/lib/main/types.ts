@@ -13,6 +13,7 @@ export type HistoryItem = {
   id: number
   type: 'original' | 'fix'
   text: string
+  usedProvider?: WorkingMode
 }
 
 export type FixTextFn = (text: string, targetLang?: TargetLanguageCode) => Promise<string>

@@ -9,6 +9,7 @@ export type AppConfig = {
   ollamaModel: string | null
   openAIModel: string | null
   backgroundNotificationShown: boolean
+  lastWindowSize: { width: number; height: number } | null
 }
 
 export class RegularConfigHelper {
@@ -25,6 +26,7 @@ export class RegularConfigHelper {
         ollamaModel: null,
         openAIModel: null,
         backgroundNotificationShown: false,
+        lastWindowSize: null,
       }
       return initialConfig
     }
@@ -38,6 +40,7 @@ export class RegularConfigHelper {
         ollamaModel: null,
         openAIModel: null,
         backgroundNotificationShown: false,
+        lastWindowSize: null,
       }
     }
   }

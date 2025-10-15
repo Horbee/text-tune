@@ -39,7 +39,7 @@ export class FixService {
     const fixed = await provider.fix(text)
 
     this.history.push({ id: this.history.length + 1, type: 'original', text })
-    this.history.push({ id: this.history.length + 1, type: 'fix', text: fixed })
+    this.history.push({ id: this.history.length + 1, type: 'fix', text: fixed, usedProvider: this.activeMode })
 
     return { original: text, fixed, history: this.history }
   }
