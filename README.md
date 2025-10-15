@@ -1,71 +1,66 @@
-# TextTune
+# Text Tune
 
-A Python application that helps to fix german and english texts with DeepL backt-ranslation or with local LLM models using the Ollama API.
+Text Tune is a desktop assistant that rewrites and fixes text straight from your clipboard. The Electron app offers DeepL, OpenAI and local Ollama models, allowing you to use AI tools to edit your text without leaving your editor, so you can maintain your writing flow.
 
-## Description
+![Screenshot](screenshot.png)
 
-TextTune is a utility that allows you to easily translate and fix text using the DeepL translation API or local LLMs with Ollama. The application monitors your clipboard and can be triggered with keyboard shortcuts to process text.
+## Highlights
 
-# Python Application
+- Fix German and English text with DeepL, OpenAI, or local Ollama models
+- Trigger rewrites from anywhere via global shortcuts (`F9` for the current line, `F10` for the current selection)
+- Review the fix history, compare provider output
+- Securely store API keys using the operating system’s encrypted storage
+- Lightweight tray app that stays out of the way until you need it
 
-## Prerequisites
+## Getting Started
 
-- Python 3.11 or higher
-- Poetry package manager
+- Install Node.js 22+ (npm 10+ is recommended) and Git
+- Clone the repository and install the Electron dependencies:
+  ```bash
+  git clone https://github.com/Horbee/text-tune.git
+  cd text-tune/electron-app
+  npm install
+  ```
+- Launch the desktop app in development mode:
+  ```bash
+  npm run dev
+  ```
 
-## Installation
+## Provider Setup
 
-1. Clone the repository:
+- The **Services** section inside the app allowes you to choose between DeepL, Ollama, and ChatGPT (OpenAI)
+- Paste your DeepL or OpenAI API keys directly in the UI. Keys are encrypted with `safeStorage` and saved under the app’s user data directory
+- For Ollama, select the model name that is available on your host; the app will remember your choice across restarts
 
-   ```
-   git clone https://github.com/Horbee/texttune.git
-   cd texttune/python
-   ```
+## Keyboard Workflow & Tray
 
-2. Install dependencies using Poetry:
+- `F9` grabs the current line, sends it to the active provider, and pastes the fixed text back
+- `F10` fixes the current selection without changing your cursor position
+- The tray icon gives quick access to opening the window or quitting the background process
 
-   ```
-   poetry install
-   ```
+## Building Installers
 
-3. Create a `.env` file in the project root with your DeepL API key (free version is sufficient):
-   ```
-   DEEPL_API_KEY=your_deepl_api_key
-   ```
+- Run the platform-specific packaging scripts from `electron-app`:
+  ```bash
+  npm run build:mac
+  npm run build:win
+  npm run build:linux
+  ```
+- For a distribution-ready unpacked build use `npm run build:unpack`
 
-## Usage
+## Repository Layout
 
-1. Run the application:
+- `electron-app/`: Electron + React desktop code (main, preload, and renderer bundles)
+- `python/`: command-line version of Text Tune; see the dedicated [README](python/README.md) for usage details
 
-   ```
-   poetry run python src/main.py
-   ```
+## Troubleshooting
 
-2. Select DeepL or Ollama as provider via the command line
-
-3. If you want to use Ollama, make sure to pull the model you want to use. We recommend using `llama 3.2`
-
-   ```
-   ollama pull llama3.2
-   ```
-
-## Features
-
-- Fix german and english texts using DeepL API
-- Fix german and english texts using local LLM models with Ollama
-- Global keyboard shortcuts for quick access
-- Clipboard monitoring
+- macOS keyboard automation requires Accessibility access for the app; if permissions get stuck, reset them with:
+  ```bash
+  tccutil reset Accessibility
+  ```
+  After resetting you must re-authorize every app that needs Accessibility control.
 
 ## License
 
-[MIT](LICENSE)
-
-Permissions cache needs a reset
-
-Sometimes the TCC (Transparency, Consent, and Control) database gets stuck. You can reset accessibility permissions with:
-
-```bash
-tccutil reset Accessibility
-```
-
-⚠️ This clears permissions for all apps, so you’ll need to re-grant them.
+- [MIT](LICENSE)
