@@ -1,6 +1,6 @@
 {
   "name": "text-tune",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A modern Electron application that fixes text in your clipboard",
   "main": "./out/main/main.js",
   "license": "MIT",
