@@ -3,7 +3,7 @@ import { Drawer, Grid, Group, Stack, Title } from '@mantine/core'
 import { showNotification } from '@mantine/notifications'
 import { motion } from 'motion/react'
 
-import { Instructions, FixHistoryContainer, Header, ServiceCards } from '@/lib/frontend/components'
+import { Instructions, FixHistoryContainer, Header, ProviderCards } from '@/lib/frontend/components'
 import { useBackendStore } from '@/lib/frontend/stores/backend-store'
 import { useDrawerStore } from '@/lib/frontend/stores/drawer-store'
 import { MdOutlineAutoAwesome } from 'react-icons/md'
@@ -40,7 +40,7 @@ function App() {
       <Grid gutter={0}>
         <Grid.Col span={{ base: 12, md: 8 }} p="lg">
           <Stack>
-            <ServiceCards />
+            <ProviderCards />
 
             <motion.div layout>
               <MotionInstructions layout />

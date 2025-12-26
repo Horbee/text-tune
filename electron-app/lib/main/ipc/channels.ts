@@ -3,6 +3,7 @@ import type { HistoryItem } from '../types'
 export const IPC_CHANNELS = {
   fixSuccess: 'fix-success',
   error: 'error',
+  focusTextTuneUrlInput: 'focus-text-tune-url-input',
   focusApiKeyInput: 'focus-api-key-input',
   focusModelSelector: 'focus-model-selector',
 } as const

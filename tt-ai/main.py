@@ -3,6 +3,8 @@ from contextlib import asynccontextmanager
 from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
 
 from schemas import GECInput, GECOutput
 from model.handler import ministral_model_pipeline
@@ -22,6 +24,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 async def root():
     return {"message": "Text Tune AI is running!"}
@@ -34,6 +44,6 @@ async def gec(input: GECInput) -> GECOutput:
         correction = await loop.run_in_executor(
             executor, ministral_model_pipeline, input.text
         )
-        return GECOutput(corrected_text=correction)
+        return GECOutput(corrected_sentence=correction, original_sentence=input.text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Model inference failed: {str(e)}")

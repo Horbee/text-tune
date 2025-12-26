@@ -1,13 +1,13 @@
 import { ipcMain } from 'electron'
-import { ConfigService } from '@/lib//main/services'
+import { ConfigService, PingService } from '@/lib//main/services'
 import type { FixService } from '@/lib/main/services'
-import { WorkingMode } from '../main/types'
+import type { WorkingMode } from '@/lib/main/types'
 
 const handleIPC = (channel: string, handler: (...args: any[]) => void) => {
   ipcMain.handle(channel, handler)
 }
 
-export const registerFrontendIPC = (configService: ConfigService, fixService: FixService) => {
+export const registerFrontendIPC = (configService: ConfigService, fixService: FixService, pingService: PingService) => {
   // DeepL Text Handlers
   handleIPC('save-deepl-api-key', (_e, deeplApiKey: string) => {
     try {
@@ -50,10 +50,29 @@ export const registerFrontendIPC = (configService: ConfigService, fixService: Fi
     return !!configService.getOpenAIKey()
   })
 
+  // Text Tune AI Handlers
+  handleIPC('save-text-tune-server-url', async (_e, textTuneServerUrl: string) => {
+    try {
+      await pingService.ping<{ message: string }>(textTuneServerUrl) // Test the connection
+      configService.setTextTuneServerUrl(textTuneServerUrl)
+    } catch (error) {
+      throw error
+    }
+  })
+
+  handleIPC('delete-text-tune-server-url', async () => {
+    try {
+      configService.setTextTuneServerUrl(null)
+    } catch (error) {
+      throw error
+    }
+  })
+
   handleIPC('get-backend-state', () => ({
     workingMode: configService.getWorkingMode(),
     ollamaModel: configService.getOllamaModel(),
     openAIModel: configService.getOpenAIModel(),
+    textTuneServerUrl: configService.getTextTuneServerUrl(),
     translateHistory: fixService.getHistory(),
   }))
 

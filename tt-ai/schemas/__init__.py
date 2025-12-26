@@ -6,4 +6,5 @@ class GECInput(BaseModel):
 
 
 class GECOutput(BaseModel):
-    corrected_text: str
+    corrected_sentence: str
+    original_sentence: str

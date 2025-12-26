@@ -1,19 +1,15 @@
 import { Text, Box, Paper, Flex, darken } from '@mantine/core'
-import { SiDeepl, SiOpenai, SiOllama } from 'react-icons/si'
 import { showNotification } from '@mantine/notifications'
 import { useHover } from '@mantine/hooks'
 import { motion } from 'motion/react'
+import { getServiceByValue } from '@/lib/frontend/utils/services'
 import type { HistoryItem } from '@/lib/main/types'
 
 interface Props {
   item: HistoryItem
 }
 
-const providerIcons = {
-  deepl: <SiDeepl fontSize={20} />,
-  ollama: <SiOllama fontSize={20} />,
-  chatgpt: <SiOpenai fontSize={20} />,
-}
+const HISTORY_ICON_SIZE = 20
 
 export const FixHistoryItem = ({ item }: Props) => {
   const { hovered, ref } = useHover()
@@ -49,7 +45,7 @@ export const FixHistoryItem = ({ item }: Props) => {
             {item.type.toUpperCase()}
           </Text>
 
-          {item.usedProvider && <Box ml="auto">{providerIcons[item.usedProvider]}</Box>}
+          {item.usedProvider && <Box ml="auto">{getServiceByValue(item.usedProvider)?.icon(HISTORY_ICON_SIZE)}</Box>}
         </Flex>
         <Text size="sm" fw={700} c={isFix ? 'gray.3' : 'orange.2'} mt="xs">
           {item.text}

@@ -1,6 +1,7 @@
 import { Alert, Select, Stack, Title, Text, Code, type StackProps } from '@mantine/core'
-import { useRef, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { GoAlert } from 'react-icons/go'
+import { useInputFocus } from '@/lib/frontend/hooks/useInputFocus'
 import axios from 'axios'
 
 type Props = {
@@ -12,7 +13,7 @@ export const OllamaConfigManager = ({ selectedModel, setSelectedModel, ...props 
   const [models, setModels] = useState<string[]>([])
   const [ollamaError, setOllamaError] = useState(false)
 
-  const modelSelectorRef = useRef<HTMLInputElement>(null)
+  const modelSelectorRef = useInputFocus<HTMLInputElement>('focus-model-selector')
 
   const getOllamaData = async () => {
     // Check if ollama is running
@@ -29,14 +30,6 @@ export const OllamaConfigManager = ({ selectedModel, setSelectedModel, ...props 
 
   useEffect(() => {
     getOllamaData()
-  }, [])
-
-  useEffect(() => {
-    const unsub = window.api.receive('focus-model-selector', () => {
-      modelSelectorRef.current?.focus()
-    })
-
-    return () => unsub()
   }, [])
 
   return (

@@ -4,12 +4,13 @@ import { FaCheck, FaTimesCircle, FaKeyboard } from 'react-icons/fa'
 import { useBackendStore } from '@/lib/frontend/stores/backend-store'
 
 export const Instructions = () => {
-  const { workingMode, deeplApiKeySaved, ollamaModelSelected, openAIApiKeySaved } = useBackendStore()
+  const { workingMode, deeplApiKeySaved, ollamaModelSelected, openAIApiKeySaved, textTuneServerUrl } = useBackendStore()
 
   const readyToFix =
     (workingMode === 'deepl' && deeplApiKeySaved) ||
     (workingMode === 'ollama' && ollamaModelSelected) ||
-    (workingMode === 'chatgpt' && openAIApiKeySaved)
+    (workingMode === 'chatgpt' && openAIApiKeySaved) ||
+    (workingMode === 'tt-ai' && !!textTuneServerUrl)
 
   return (
     <Stack gap="sm">

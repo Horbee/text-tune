@@ -1,17 +1,42 @@
-import { Button, PasswordInput, Stack, Text, Title, StackProps, Group, ActionIcon, Flex, Paper } from '@mantine/core'
+import {
+  Select,
+  Stack,
+  Title,
+  Text,
+  type StackProps,
+  PasswordInput,
+  Button,
+  Flex,
+  Paper,
+  ActionIcon,
+  Group,
+} from '@mantine/core'
 import { hasLength, useForm } from '@mantine/form'
-import { useRef, useEffect } from 'react'
-import { FaCheck, FaTrashAlt } from 'react-icons/fa'
+import { useEffect } from 'react'
+import { FaTrashAlt, FaCheck } from 'react-icons/fa'
 import { IoMdCheckmarkCircleOutline } from 'react-icons/io'
+import { useInputFocus } from '@/lib/frontend/hooks/useInputFocus'
 
 type Props = {
+  selectedModel: string | null
+  setSelectedModel: (model: string | null) => void
   apiKeySaved: boolean
   saveApiKey: (apiKey: string) => Promise<void>
   deleteApiKey: () => void
 } & StackProps
 
-export const DeeplConfigManager = ({ apiKeySaved, saveApiKey, deleteApiKey, ...props }: Props) => {
-  const apiKeyInputRef = useRef<HTMLInputElement>(null)
+const CHATGPT_MODELS = ['gpt-5-nano', 'gpt-5-mini', 'gpt-5']
+
+export const ChatGPTConfigManager = ({
+  selectedModel,
+  setSelectedModel,
+  saveApiKey,
+  deleteApiKey,
+  apiKeySaved,
+  ...props
+}: Props) => {
+  const apiKeyInputRef = useInputFocus<HTMLInputElement>('focus-api-key-input')
+  const modelSelectorRef = useInputFocus<HTMLInputElement>('focus-model-selector')
 
   const form = useForm({
     mode: 'controlled',
@@ -21,22 +46,32 @@ export const DeeplConfigManager = ({ apiKeySaved, saveApiKey, deleteApiKey, ...p
     },
   })
 
-  useEffect(() => {
-    const unsub = window.api.receive('focus-api-key-input', () => {
-      apiKeyInputRef.current?.focus()
-    })
-
-    return () => unsub()
-  }, [])
-
   const submit = (values: typeof form.values) => {
-    saveApiKey(values.apiKey)
+    saveApiKey(values.apiKey.trim())
     form.reset()
   }
 
+  useEffect(() => {
+    // Set default model if none selected
+    if (!selectedModel || !CHATGPT_MODELS.includes(selectedModel)) {
+      setSelectedModel(CHATGPT_MODELS[0]) // gpt-5-nano as default
+    }
+  }, [selectedModel, setSelectedModel])
+
   return (
     <Stack gap="sm" {...props}>
-      <Title order={3}>Save your DeepL API Key</Title>
+      <Title order={3}>ChatGPT Configuration</Title>
+
+      {apiKeySaved && (
+        <Select
+          ref={modelSelectorRef}
+          label="Model"
+          data={CHATGPT_MODELS}
+          value={selectedModel}
+          onChange={setSelectedModel}
+          description="Select the ChatGPT model to use"
+        />
+      )}
 
       {!apiKeySaved ? (
         <form onSubmit={form.onSubmit(submit)} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -63,7 +98,7 @@ export const DeeplConfigManager = ({ apiKeySaved, saveApiKey, deleteApiKey, ...p
                 Your API Key is saved
               </Text>
               <Text c="green.6" size="sm">
-                You can now use the extension, or delete the key and enter a new one.
+                You can now select a model and use the extension.
               </Text>
             </Stack>
             <Button

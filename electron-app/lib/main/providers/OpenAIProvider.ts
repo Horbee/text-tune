@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { zodTextFormat } from 'openai/helpers/zod'
 import type { Provider } from './Provider'
 import type { WorkingMode } from '@/lib/main/types'
-import type { NotificationService, LogService } from '@/lib/main/services'
+import type { NotificationService, LogService, BroadcastService } from '@/lib/main/services'
 
 const TextSchema = z.object({
   correctedText: z.string(),
@@ -17,18 +17,21 @@ export class OpenAIProvider implements Provider {
     private modelGetter: () => string | null,
     private keyGetter: () => string | null,
     private notificationService: NotificationService,
-    private logService: LogService
+    private logService: LogService,
+    private broadcastService: BroadcastService
   ) {}
-
-  isReady(): boolean {
-    return !!this.modelGetter() && !!this.keyGetter()
-  }
 
   async ensureReady(): Promise<void> {
     const model = this.modelGetter()
     const key = this.keyGetter()
-    if (!model) throw new Error('No OpenAI model selected')
-    if (!key) throw new Error('No OpenAI API key configured')
+    if (!model) {
+      this.broadcastService.focusModelSelector()
+      throw new Error('No OpenAI model selected')
+    }
+    if (!key) {
+      this.broadcastService.focusApiKeyInput()
+      throw new Error('No OpenAI API key configured')
+    }
     if (!this.client) {
       this.client = new OpenAI({
         apiKey: key,

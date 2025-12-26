@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { Provider } from './Provider'
 import type { WorkingMode } from '@/lib/main/types'
-import type { NotificationService, LogService } from '@/lib/main/services'
+import type { NotificationService, LogService, BroadcastService } from '@/lib/main/services'
 
 const OLLAMA_ENDPOINT = 'http://localhost:11434'
 
@@ -20,16 +20,16 @@ export class OllamaProvider implements Provider {
   constructor(
     private modelGetter: () => string | null,
     private notificationService: NotificationService,
-    private logService: LogService
+    private logService: LogService,
+    private broadcastService: BroadcastService
   ) {}
-
-  isReady(): boolean {
-    return !!this.modelGetter()
-  }
 
   async ensureReady(): Promise<void> {
     const model = this.modelGetter()
-    if (!model) throw new Error('No Ollama model selected')
+    if (!model) {
+      this.broadcastService.focusModelSelector()
+      throw new Error('No Ollama model selected')
+    }
   }
 
   async fix(text: string): Promise<string> {

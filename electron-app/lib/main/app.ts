@@ -3,23 +3,27 @@ import { join } from 'path'
 import { registerFrontendIPC } from '@/lib/frontend/ipcEvents'
 import appIcon from '@/resources/build/icon.png?asset'
 
-import { IPCChannel } from './ipc/channels'
-import { LogService, NotificationService, ClipboardService, ConfigService, ErrorHandler, FixService } from './services'
-import { DeepLProvider, OllamaProvider, OpenAIProvider } from './providers'
+import {
+  BroadcastService,
+  LogService,
+  NotificationService,
+  ClipboardService,
+  ConfigService,
+  ErrorHandler,
+  FixService,
+  PingService,
+} from './services'
+import { DeepLProvider, OllamaProvider, OpenAIProvider, TextTuneAIProvider } from './providers'
 
 // Service singletons (lightweight)
+let broadcastService: BroadcastService
 let logService: LogService
 let notificationService: NotificationService
 let clipboardService: ClipboardService
 let configService: ConfigService
+let pingService: PingService
 let fixService: FixService
 let errorHandler: ErrorHandler
-
-function broadcastToAll(channel: IPCChannel, message: any) {
-  BrowserWindow.getAllWindows().forEach((w) => {
-    w.webContents.send(channel, message)
-  })
-}
 
 export const fixCurrentLine = async () => {
   logService.debug('fixCurrentLine called')
@@ -37,10 +41,10 @@ export const fixSelection = async () => {
     const result = await fixService.fix(original)
 
     await clipboardService.replaceSelection(result.fixed)
-    broadcastToAll('fix-success', { historyState: result.history })
+    broadcastService.fixSuccess({ historyState: fixService.getHistory() })
   } catch (err: any) {
     errorHandler.general('fixSelection', err)
-    broadcastToAll('error', { title: 'Fix Failed', message: err?.message || 'Unknown error' })
+    broadcastService.error({ title: 'Fix Failed', message: err?.message || 'Unknown error' })
   }
 }
 
@@ -78,7 +82,7 @@ export function createTray(): void {
 
 export function registerAppIPC(): void {
   // Register IPC events for the Frontend (now using services)
-  registerFrontendIPC(configService, fixService)
+  registerFrontendIPC(configService, fixService, pingService)
 }
 
 export function getConfigService() {
@@ -87,24 +91,39 @@ export function getConfigService() {
 
 export function initServices(): void {
   // Initialize services
+  broadcastService = new BroadcastService()
   logService = new LogService()
   notificationService = new NotificationService()
   clipboardService = new ClipboardService()
   configService = new ConfigService()
+  pingService = new PingService()
   errorHandler = new ErrorHandler(notificationService, logService)
   fixService = new FixService(configService.getWorkingMode())
 
   logService.info('Services initialized')
 
   // Register providers
-  fixService.registerProvider(new DeepLProvider(() => configService.getDeepLApiKey(), notificationService, logService))
-  fixService.registerProvider(new OllamaProvider(() => configService.getOllamaModel(), notificationService, logService))
+  fixService.registerProvider(
+    new DeepLProvider(() => configService.getDeepLApiKey(), notificationService, logService, broadcastService)
+  )
+  fixService.registerProvider(
+    new OllamaProvider(() => configService.getOllamaModel(), notificationService, logService, broadcastService)
+  )
   fixService.registerProvider(
     new OpenAIProvider(
       () => configService.getOpenAIModel(),
       () => configService.getOpenAIKey(),
       notificationService,
-      logService
+      logService,
+      broadcastService
+    )
+  )
+  fixService.registerProvider(
+    new TextTuneAIProvider(
+      () => configService.getTextTuneServerUrl(),
+      notificationService,
+      logService,
+      broadcastService
     )
   )
 

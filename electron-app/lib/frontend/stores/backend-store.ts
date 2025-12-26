@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { showErrorNotification } from '../App'
+import { showErrorNotification } from '@/lib/frontend/App'
 
 import type { HistoryItem, WorkingMode } from '@/lib/main/types'
 
@@ -24,6 +24,10 @@ type Store = {
   // Deepl Config
   saveDeeplApiKey: (apiKey: string) => Promise<void>
   deleteDeeplApiKey: () => Promise<void>
+  // Text Tune AI Config
+  textTuneServerUrl: string | null
+  saveTextTuneServerUrl: (textTuneServerUrl: string) => Promise<void>
+  deleteTextTuneServerUrl: () => Promise<void>
 }
 
 export const useBackendStore = create<Store>()((set) => ({
@@ -37,6 +41,7 @@ export const useBackendStore = create<Store>()((set) => ({
   selectedChatgptModel: null,
   chatgptApiKey: '',
   fixHistory: [],
+  textTuneServerUrl: null,
 
   initStore: async () => {
     const deeplApiKeySaved = await window.api.invoke('check-deepl-api-key')
@@ -51,6 +56,7 @@ export const useBackendStore = create<Store>()((set) => ({
       selectedOllamaModel: backendState.ollamaModel,
       selectedOpenAIModel: backendState.openAIModel,
       fixHistory: backendState.translateHistory,
+      textTuneServerUrl: backendState.textTuneServerUrl,
     })
   },
 
@@ -63,7 +69,6 @@ export const useBackendStore = create<Store>()((set) => ({
     }
   },
   setWorkingMode: async (mode) => {
-    console.log(mode)
     try {
       await window.api.invoke('set-working-mode', mode)
       set({ workingMode: mode })
@@ -111,6 +116,24 @@ export const useBackendStore = create<Store>()((set) => ({
       set({ openAIApiKeySaved: false })
     } catch (error) {
       showErrorNotification('OpenAI Api Key was not deleted!', 'Please try again.')
+    }
+  },
+  saveTextTuneServerUrl: async (textTuneServerUrl) => {
+    try {
+      await window.api.invoke('save-text-tune-server-url', textTuneServerUrl)
+      set({ textTuneServerUrl })
+    } catch (error: any) {
+      const errorMessage = error.message?.split('Error: ')[1]
+      showErrorNotification('Text Tune Server URL was not saved!', errorMessage || 'Please try again.')
+      set({ textTuneServerUrl: null })
+    }
+  },
+  deleteTextTuneServerUrl: async () => {
+    try {
+      await window.api.invoke('delete-text-tune-server-url')
+      set({ textTuneServerUrl: null })
+    } catch (error) {
+      showErrorNotification('Text Tune Server URL was not deleted!', 'Please try again.')
     }
   },
   setupListeners: () => {

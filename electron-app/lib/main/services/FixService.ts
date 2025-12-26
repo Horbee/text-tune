@@ -4,7 +4,6 @@ import { Provider } from '../providers/Provider'
 export interface FixResult {
   original: string
   fixed: string
-  history: HistoryItem[]
 }
 
 export class FixService {
@@ -41,6 +40,6 @@ export class FixService {
     this.history.push({ id: this.history.length + 1, type: 'original', text })
     this.history.push({ id: this.history.length + 1, type: 'fix', text: fixed, usedProvider: this.activeMode })
 
-    return { original: text, fixed, history: this.history }
+    return { original: text, fixed }
   }
 }
