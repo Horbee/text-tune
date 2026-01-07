@@ -1,4 +1,4 @@
-FROM /models/ministral-3:3b-GEC-q8_0.gguf
+FROM /models/ministral-3_3b-GEC-q8_0.gguf
 
 TEMPLATE "[INST] {{ if .System }}{{ .System }}\n\n{{ end }}{{ .Prompt }} [/INST] "
 

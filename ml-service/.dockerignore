@@ -1,6 +1,9 @@
 # Ignore GGUF model files
 models/
 
+# Database files
+*.db
+
 # Version control
 .git/
 .github/
