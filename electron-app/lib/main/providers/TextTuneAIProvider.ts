@@ -4,8 +4,8 @@ import type { WorkingMode } from '@/lib/main/types'
 import type { NotificationService, LogService, BroadcastService } from '@/lib/main/services'
 
 type TextTuneAIResponse = {
-  corrected_sentence: string
-  original_sentence: string
+  corrected: string
+  original: string
 }
 
 export class TextTuneAIProvider implements Provider {
@@ -34,9 +34,9 @@ export class TextTuneAIProvider implements Provider {
     this.logService.info('[TextTuneAIProvider] Fixing text')
 
     try {
-      const gecUrl = `${this.textTuneServerUrl}/gec`
+      const gecUrl = `${this.textTuneServerUrl}/api/gec`
       const response = await axios.post<TextTuneAIResponse>(gecUrl, { text })
-      return response.data.corrected_sentence
+      return response.data.corrected
     } catch (error: any) {
       console.error('Error fixing text with TextTuneAI:', error)
 

@@ -1,0 +1,70 @@
+services:
+  # The Inference Engine
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-server
+    volumes:
+      # Mount the local folder containing your GGUF so Ollama can see it
+      # - ./models:/usr/share/ollama/.ollama/models/local_mount
+      - ./models:/models
+      # Persist Ollama's internal data (so you don't have to recreate models on restart)
+      - ollama_storage:/root/.ollama
+    ports:
+      - '11435:11434' # Optional: only if you want to access it from host
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'sh', '-c', "ollama list | grep -q 'ministral-3-3b-gec:latest'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    #   start_period: 10s
+    # Enable GPU support if you have it (Nvidia)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    entrypoint: ['/bin/sh', '-c']
+    command:
+      - |
+        # Start Ollama server in background
+        ollama serve &
+        # Wait for Ollama to be ready
+        until ollama list >/dev/null 2>&1; do
+          echo "Waiting for Ollama to start..."
+          sleep 2
+        done
+        echo "Ollama is ready!"
+        # Check if model exists, create if not
+        if ! ollama list | grep -q "ministral-3-3b-gec:latest"; then
+          echo "Model ministral-3-3b-gec not found. Creating from Modelfile..."
+          ollama create ministral-3-3b-gec -f /models/Modelfile
+          echo "Model created successfully!"
+        else
+          echo "Model ministral-3-3b-gec already exists."
+        fi
+        # Keep container running by waiting on the background process
+        wait
+
+  # Your Business Logic
+  nestjs-app:
+    container_name: ml-service
+    build: .
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    networks:
+      - app-network
+    ports:
+      - '3000:3000'
+
+volumes:
+  ollama_storage:
+
+networks:
+  app-network:

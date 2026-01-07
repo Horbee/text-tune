@@ -11,6 +11,10 @@ import {
   createOrShowWindow,
 } from './app'
 
+// Enable usage of Portal's globalShortcuts. This is essential for cases when
+// the app runs in a Wayland session.
+app.commandLine.appendSwitch('enable-features', 'GlobalShortcutsPortal')
+
 // Single instance lock - prevent multiple instances
 const gotTheLock = app.requestSingleInstanceLock()
 
@@ -74,6 +78,11 @@ if (!gotTheLock) {
     //   app.quit()
     // }
   })
+
+  app.on('will-quit', () => {
+  // Unregister all shortcuts.
+  globalShortcut.unregisterAll()
+})
 }
 
 // In this file, you can include the rest of your app's specific main process

@@ -1,0 +1,6 @@
+dist/
+node_modules/
+*.gguf
+/generated/prisma
+.env
+*.db

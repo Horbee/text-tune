@@ -1,0 +1,10 @@
+FROM /models/ministral-3:3b-GEC-q8.gguf
+
+TEMPLATE "[INST] {{ if .System }}{{ .System }}\n\n{{ end }}{{ .Prompt }} [/INST] "
+
+SYSTEM "Korrigiere die Grammatik im folgenden Satz auf Standarddeutsch. Gib **nur** den korrigierten Satz zurück, ohne Anmerkungen."
+
+PARAMETER num_ctx 4096
+PARAMETER temperature 0.1
+PARAMETER stop "</s>"
+PARAMETER stop "[/INST]"
