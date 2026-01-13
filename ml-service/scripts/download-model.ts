@@ -6,7 +6,7 @@ import { Readable } from 'stream'
 import { finished } from 'stream/promises'
 
 async function downloadModel() {
-  const REPO_ID = 'Horbee/Ministral-3-8B-GEC-german-GGUF'
+  const REPO_ID = 'Horbee/Ministral-3-GEC-german-GGUF'
   const FILENAME = 'Ministral-8B-Q4_K_M.gguf'
   const LOCAL_DIR = path.join(__dirname, '..', 'models')
   const REVISION = 'main'
