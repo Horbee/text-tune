@@ -1,8 +1,8 @@
-FROM /models/ministral-3_3b-GEC-q8_0.gguf
+FROM ./Ministral-8B-Q4_K_M.gguf
 
-TEMPLATE "[INST] {{ if .System }}{{ .System }}\n\n{{ end }}{{ .Prompt }} [/INST] "
+TEMPLATE "[INST]{{ if .System }}{{ .System }}\n\n{{ end }}{{ .Prompt }}[/INST]"
 
-SYSTEM "Korrigiere die Grammatik im folgenden Satz auf Standarddeutsch. Gib **nur** den korrigierten Satz zurück, ohne Anmerkungen."
+SYSTEM "Korrigiere die Grammatik im folgenden Text, aber behalte den ursprünglichen Stil und Ton bei. Verleihe dem Text keine formelle Note, wenn er diese nicht hat. Gib **nur** den korrigierten Satz zurück, ohne Anmerkungen. Wenn der Satz korrekt ist, gib ihn unverändert zurück."
 
 PARAMETER num_ctx 4096
 PARAMETER temperature 0.1

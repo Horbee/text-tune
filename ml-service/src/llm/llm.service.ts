@@ -5,7 +5,7 @@ import { PrismaService } from '@/db/prisma.service'
 @Injectable()
 export class LlmService {
   private ollama: Ollama
-  private modelName = 'ministral-3-3b-gec'
+  private modelName = 'text-tune-ai'
   private host = process.env.OLLAMA_HOST || 'http://localhost:11435'
 
   constructor(private prisma: PrismaService) {

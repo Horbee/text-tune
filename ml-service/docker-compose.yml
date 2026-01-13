@@ -14,7 +14,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'sh', '-c', "ollama list | grep -q 'ministral-3-3b-gec:latest'"]
+      test: ['CMD', 'sh', '-c', "ollama list | grep -q 'text-tune-ai:latest'"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -39,12 +39,12 @@ services:
         done
         echo "Ollama is ready!"
         # Check if model exists, create if not
-        if ! ollama list | grep -q "ministral-3-3b-gec:latest"; then
-          echo "Model ministral-3-3b-gec not found. Creating from Modelfile..."
-          ollama create ministral-3-3b-gec -f /models/Modelfile
+        if ! ollama list | grep -q "text-tune-ai:latest"; then
+          echo "Model text-tune-ai not found. Creating from Modelfile..."
+          ollama create text-tune-ai -f /models/Modelfile
           echo "Model created successfully!"
         else
-          echo "Model ministral-3-3b-gec already exists."
+          echo "Model text-tune-ai already exists."
         fi
         # Keep container running by waiting on the background process
         wait

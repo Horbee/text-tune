@@ -23,7 +23,7 @@ describe('LlmService', () => {
       const mockPrompt = 'This is a test sentense.'
       const mockResponse = {
         response: 'This is a test sentence.',
-        model: 'ministral-3-3b-gec',
+        model: 'text-tune-ai',
         done: true,
       }
 
@@ -32,7 +32,7 @@ describe('LlmService', () => {
       const result = await service.generateCorrection(mockPrompt)
 
       expect(mockOllama.generate).toHaveBeenCalledWith({
-        model: 'ministral-3-3b-gec',
+        model: 'text-tune-ai',
         prompt: mockPrompt,
         stream: false,
       })
