@@ -1,4 +1,4 @@
-FROM ./Ministral-8B-Q4_K_M.gguf
+FROM ./Text-Tune-Small-v6.gguf
 
 TEMPLATE "[INST]{{ if .System }}{{ .System }}\n\n{{ end }}{{ .Prompt }}[/INST]"
 

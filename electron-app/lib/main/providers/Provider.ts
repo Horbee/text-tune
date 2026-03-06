@@ -4,6 +4,7 @@ export interface Provider {
   readonly id: WorkingMode
   ensureReady(): Promise<void> // throws with descriptive error if not ready
   fix(text: string): Promise<string>
+  getModel(): string | null
 }
 
 export interface ProviderInitContext {

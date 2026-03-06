@@ -26,6 +26,8 @@ type Store = {
   deleteDeeplApiKey: () => Promise<void>
   // Text Tune AI Config
   textTuneServerUrl: string | null
+  selectedTextTuneModel: string | null
+  setSelectedTextTuneModel: (model: string | null) => void
   saveTextTuneServerUrl: (textTuneServerUrl: string) => Promise<void>
   deleteTextTuneServerUrl: () => Promise<void>
 }
@@ -42,6 +44,7 @@ export const useBackendStore = create<Store>()((set) => ({
   chatgptApiKey: '',
   fixHistory: [],
   textTuneServerUrl: null,
+  selectedTextTuneModel: null,
 
   initStore: async () => {
     const deeplApiKeySaved = await window.api.invoke('check-deepl-api-key')
@@ -57,6 +60,7 @@ export const useBackendStore = create<Store>()((set) => ({
       selectedOpenAIModel: backendState.openAIModel,
       fixHistory: backendState.translateHistory,
       textTuneServerUrl: backendState.textTuneServerUrl,
+      selectedTextTuneModel: backendState.textTuneModel,
     })
   },
 
@@ -126,6 +130,14 @@ export const useBackendStore = create<Store>()((set) => ({
       const errorMessage = error.message?.split('Error: ')[1]
       showErrorNotification('Text Tune Server URL was not saved!', errorMessage || 'Please try again.')
       set({ textTuneServerUrl: null })
+    }
+  },
+  setSelectedTextTuneModel: async (model) => {
+    try {
+      await window.api.invoke('set-text-tune-model', model)
+      set({ selectedTextTuneModel: model })
+    } catch (error) {
+      showErrorNotification('Text Tune model was not set!', 'Please try again.')
     }
   },
   deleteTextTuneServerUrl: async () => {

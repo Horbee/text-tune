@@ -18,15 +18,11 @@ export function FixHistoryContainer({ hideTitle }: { hideTitle?: boolean }) {
           <Title order={3}>History</Title>
         </Group>
       )}
+
       <ScrollArea h={scrollAreaHeight} offsetScrollbars scrollHideDelay={0}>
         <Flex direction="column" gap="sm" p="4px">
           {reversedHistory.map((item) => (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: item.type === 'fix' ? 0.2 : 0 }}
-              key={item.id}
-            >
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key={item.id}>
               <FixHistoryItem item={item} />
             </motion.div>
           ))}

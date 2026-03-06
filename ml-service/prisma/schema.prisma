@@ -5,9 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-  moduleFormat  = "cjs"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -15,11 +15,12 @@ datasource db {
 }
 
 model Correction {
-  id          Int      @default(autoincrement()) @id
-  original    String
-  corrected   String
-  prompt      String
-  createdAt   DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  original  String
+  corrected String
+  prompt    String
+  modelName String   @default("text-tune-ai-prev-gen")
+  createdAt DateTime @default(now())
 
   @@map("corrections")
 }

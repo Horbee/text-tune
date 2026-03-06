@@ -6,6 +6,7 @@ export class ConfigService {
   private workingMode: WorkingMode = 'deepl'
   private ollamaModel: string | null
   private openAIModel: string | null
+  private textTuneModel: string | null
   private backgroundNotificationShown: boolean
   private deeplApiKey: string | null
   private openaiApiKey: string | null
@@ -25,6 +26,7 @@ export class ConfigService {
     this.workingMode = cfg.workingMode
     this.ollamaModel = cfg.ollamaModel
     this.openAIModel = cfg.openAIModel
+    this.textTuneModel = cfg.textTuneModel
     this.backgroundNotificationShown = cfg.backgroundNotificationShown
     this.lastWindowSize = cfg.lastWindowSize || null
     this.textTuneServerUrl = cfg.textTuneServerUrl || null
@@ -80,6 +82,13 @@ export class ConfigService {
     this.textTuneServerUrl = url
     this.saveRegular()
   }
+  setTextTuneModel(model: string | null) {
+    this.textTuneModel = model
+    this.saveRegular()
+  }
+  getTextTuneModel() {
+    return this.textTuneModel
+  }
 
   isBackgroundNotificationShown() {
     return this.backgroundNotificationShown
@@ -105,6 +114,7 @@ export class ConfigService {
       ollamaModel: this.ollamaModel,
       openAIModel: this.openAIModel,
       textTuneServerUrl: this.textTuneServerUrl,
+      textTuneModel: this.textTuneModel,
       backgroundNotificationShown: this.backgroundNotificationShown,
       lastWindowSize: this.lastWindowSize,
     }

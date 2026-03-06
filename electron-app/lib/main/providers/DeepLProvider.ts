@@ -51,4 +51,8 @@ export class DeepLProvider implements Provider {
       return 'An error occurred while fixing the text.'
     }
   }
+
+  getModel(): string | null {
+    return 'DeepL'
+  }
 }

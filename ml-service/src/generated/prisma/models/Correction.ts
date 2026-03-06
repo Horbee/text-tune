@@ -39,6 +39,7 @@ export type CorrectionMinAggregateOutputType = {
   original: string | null
   corrected: string | null
   prompt: string | null
+  modelName: string | null
   createdAt: Date | null
 }
 
@@ -47,6 +48,7 @@ export type CorrectionMaxAggregateOutputType = {
   original: string | null
   corrected: string | null
   prompt: string | null
+  modelName: string | null
   createdAt: Date | null
 }
 
@@ -55,6 +57,7 @@ export type CorrectionCountAggregateOutputType = {
   original: number
   corrected: number
   prompt: number
+  modelName: number
   createdAt: number
   _all: number
 }
@@ -73,6 +76,7 @@ export type CorrectionMinAggregateInputType = {
   original?: true
   corrected?: true
   prompt?: true
+  modelName?: true
   createdAt?: true
 }
 
@@ -81,6 +85,7 @@ export type CorrectionMaxAggregateInputType = {
   original?: true
   corrected?: true
   prompt?: true
+  modelName?: true
   createdAt?: true
 }
 
@@ -89,6 +94,7 @@ export type CorrectionCountAggregateInputType = {
   original?: true
   corrected?: true
   prompt?: true
+  modelName?: true
   createdAt?: true
   _all?: true
 }
@@ -184,6 +190,7 @@ export type CorrectionGroupByOutputType = {
   original: string
   corrected: string
   prompt: string
+  modelName: string
   createdAt: Date
   _count: CorrectionCountAggregateOutputType | null
   _avg: CorrectionAvgAggregateOutputType | null
@@ -215,6 +222,7 @@ export type CorrectionWhereInput = {
   original?: Prisma.StringFilter<"Correction"> | string
   corrected?: Prisma.StringFilter<"Correction"> | string
   prompt?: Prisma.StringFilter<"Correction"> | string
+  modelName?: Prisma.StringFilter<"Correction"> | string
   createdAt?: Prisma.DateTimeFilter<"Correction"> | Date | string
 }
 
@@ -223,6 +231,7 @@ export type CorrectionOrderByWithRelationInput = {
   original?: Prisma.SortOrder
   corrected?: Prisma.SortOrder
   prompt?: Prisma.SortOrder
+  modelName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -234,6 +243,7 @@ export type CorrectionWhereUniqueInput = Prisma.AtLeast<{
   original?: Prisma.StringFilter<"Correction"> | string
   corrected?: Prisma.StringFilter<"Correction"> | string
   prompt?: Prisma.StringFilter<"Correction"> | string
+  modelName?: Prisma.StringFilter<"Correction"> | string
   createdAt?: Prisma.DateTimeFilter<"Correction"> | Date | string
 }, "id">
 
@@ -242,6 +252,7 @@ export type CorrectionOrderByWithAggregationInput = {
   original?: Prisma.SortOrder
   corrected?: Prisma.SortOrder
   prompt?: Prisma.SortOrder
+  modelName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.CorrectionCountOrderByAggregateInput
   _avg?: Prisma.CorrectionAvgOrderByAggregateInput
@@ -258,6 +269,7 @@ export type CorrectionScalarWhereWithAggregatesInput = {
   original?: Prisma.StringWithAggregatesFilter<"Correction"> | string
   corrected?: Prisma.StringWithAggregatesFilter<"Correction"> | string
   prompt?: Prisma.StringWithAggregatesFilter<"Correction"> | string
+  modelName?: Prisma.StringWithAggregatesFilter<"Correction"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Correction"> | Date | string
 }
 
@@ -265,6 +277,7 @@ export type CorrectionCreateInput = {
   original: string
   corrected: string
   prompt: string
+  modelName?: string
   createdAt?: Date | string
 }
 
@@ -273,6 +286,7 @@ export type CorrectionUncheckedCreateInput = {
   original: string
   corrected: string
   prompt: string
+  modelName?: string
   createdAt?: Date | string
 }
 
@@ -280,6 +294,7 @@ export type CorrectionUpdateInput = {
   original?: Prisma.StringFieldUpdateOperationsInput | string
   corrected?: Prisma.StringFieldUpdateOperationsInput | string
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  modelName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -288,6 +303,7 @@ export type CorrectionUncheckedUpdateInput = {
   original?: Prisma.StringFieldUpdateOperationsInput | string
   corrected?: Prisma.StringFieldUpdateOperationsInput | string
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  modelName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -296,6 +312,7 @@ export type CorrectionCreateManyInput = {
   original: string
   corrected: string
   prompt: string
+  modelName?: string
   createdAt?: Date | string
 }
 
@@ -303,6 +320,7 @@ export type CorrectionUpdateManyMutationInput = {
   original?: Prisma.StringFieldUpdateOperationsInput | string
   corrected?: Prisma.StringFieldUpdateOperationsInput | string
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  modelName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -311,6 +329,7 @@ export type CorrectionUncheckedUpdateManyInput = {
   original?: Prisma.StringFieldUpdateOperationsInput | string
   corrected?: Prisma.StringFieldUpdateOperationsInput | string
   prompt?: Prisma.StringFieldUpdateOperationsInput | string
+  modelName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -319,6 +338,7 @@ export type CorrectionCountOrderByAggregateInput = {
   original?: Prisma.SortOrder
   corrected?: Prisma.SortOrder
   prompt?: Prisma.SortOrder
+  modelName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -331,6 +351,7 @@ export type CorrectionMaxOrderByAggregateInput = {
   original?: Prisma.SortOrder
   corrected?: Prisma.SortOrder
   prompt?: Prisma.SortOrder
+  modelName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -339,6 +360,7 @@ export type CorrectionMinOrderByAggregateInput = {
   original?: Prisma.SortOrder
   corrected?: Prisma.SortOrder
   prompt?: Prisma.SortOrder
+  modelName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -369,6 +391,7 @@ export type CorrectionSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   original?: boolean
   corrected?: boolean
   prompt?: boolean
+  modelName?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["correction"]>
 
@@ -377,6 +400,7 @@ export type CorrectionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   original?: boolean
   corrected?: boolean
   prompt?: boolean
+  modelName?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["correction"]>
 
@@ -385,6 +409,7 @@ export type CorrectionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   original?: boolean
   corrected?: boolean
   prompt?: boolean
+  modelName?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["correction"]>
 
@@ -393,10 +418,11 @@ export type CorrectionSelectScalar = {
   original?: boolean
   corrected?: boolean
   prompt?: boolean
+  modelName?: boolean
   createdAt?: boolean
 }
 
-export type CorrectionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "original" | "corrected" | "prompt" | "createdAt", ExtArgs["result"]["correction"]>
+export type CorrectionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "original" | "corrected" | "prompt" | "modelName" | "createdAt", ExtArgs["result"]["correction"]>
 
 export type $CorrectionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Correction"
@@ -406,6 +432,7 @@ export type $CorrectionPayload<ExtArgs extends runtime.Types.Extensions.Internal
     original: string
     corrected: string
     prompt: string
+    modelName: string
     createdAt: Date
   }, ExtArgs["result"]["correction"]>
   composites: {}
@@ -834,6 +861,7 @@ export interface CorrectionFieldRefs {
   readonly original: Prisma.FieldRef<"Correction", 'String'>
   readonly corrected: Prisma.FieldRef<"Correction", 'String'>
   readonly prompt: Prisma.FieldRef<"Correction", 'String'>
+  readonly modelName: Prisma.FieldRef<"Correction", 'String'>
   readonly createdAt: Prisma.FieldRef<"Correction", 'DateTime'>
 }
     

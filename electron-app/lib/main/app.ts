@@ -41,7 +41,6 @@ export const fixSelection = async () => {
     const result = await fixService.fix(original)
 
     await clipboardService.replaceSelection(result.fixed)
-    broadcastService.fixSuccess({ historyState: fixService.getHistory() })
   } catch (err: any) {
     errorHandler.general('fixSelection', err)
     broadcastService.error({ title: 'Fix Failed', message: err?.message || 'Unknown error' })
@@ -98,7 +97,7 @@ export function initServices(): void {
   configService = new ConfigService()
   pingService = new PingService()
   errorHandler = new ErrorHandler(notificationService, logService)
-  fixService = new FixService(configService.getWorkingMode())
+  fixService = new FixService(configService.getWorkingMode(), broadcastService)
 
   logService.info('Services initialized')
 
@@ -120,6 +119,7 @@ export function initServices(): void {
   )
   fixService.registerProvider(
     new TextTuneAIProvider(
+      () => configService.getTextTuneModel(),
       () => configService.getTextTuneServerUrl(),
       notificationService,
       logService,

@@ -1,4 +1,4 @@
-import { Stack, Title, StackProps, Group, TextInput, ActionIcon } from '@mantine/core'
+import { Stack, Title, StackProps, Group, TextInput, ActionIcon, Select } from '@mantine/core'
 import { FaCheck } from 'react-icons/fa'
 import { useInputFocus } from '@/lib/frontend/hooks/useInputFocus'
 import { hasLength, useForm } from '@mantine/form'
@@ -6,17 +6,24 @@ import { ServerConnectionStatus } from './ServerConnectionStatus'
 
 type Props = {
   textTuneServerUrl: string | null
+  selectedModel: string | null
+  setSelectedModel: (model: string | null) => void
   saveTextTuneServerUrl: (textTuneServerUrl: string) => Promise<void>
   deleteTextTuneServerUrl: () => Promise<void>
 } & StackProps
+
+const TEXT_TUNE_MODELS = ['Text-Tune-Small-v6', 'Text-Tune-Base-v6', 'Text-Tune-Large-v6']
 
 export const TextTuneAIConfigManager = ({
   textTuneServerUrl,
   saveTextTuneServerUrl,
   deleteTextTuneServerUrl,
+  selectedModel,
+  setSelectedModel,
   ...props
 }: Props) => {
   const textTuneServerUrlInputRef = useInputFocus<HTMLInputElement>('focus-text-tune-url-input')
+  const modelSelectorRef = useInputFocus<HTMLInputElement>('focus-model-selector')
 
   const textTuneServerUrlSaved = !!textTuneServerUrl
 
@@ -54,10 +61,20 @@ export const TextTuneAIConfigManager = ({
           </Group>
         </form>
       ) : (
-        <ServerConnectionStatus
-          textTuneServerUrl={textTuneServerUrl}
-          deleteTextTuneServerUrl={deleteTextTuneServerUrl}
-        />
+        <>
+          <Select
+            ref={modelSelectorRef}
+            label="Model"
+            data={TEXT_TUNE_MODELS}
+            value={selectedModel}
+            onChange={setSelectedModel}
+            description="Select the Text Tune model to use"
+          />
+          <ServerConnectionStatus
+            textTuneServerUrl={textTuneServerUrl}
+            deleteTextTuneServerUrl={deleteTextTuneServerUrl}
+          />
+        </>
       )}
     </Stack>
   )

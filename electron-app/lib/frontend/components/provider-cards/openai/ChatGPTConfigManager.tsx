@@ -54,7 +54,7 @@ export const ChatGPTConfigManager = ({
   useEffect(() => {
     // Set default model if none selected
     if (!selectedModel || !CHATGPT_MODELS.includes(selectedModel)) {
-      setSelectedModel(CHATGPT_MODELS[0]) // gpt-5-nano as default
+      setSelectedModel(CHATGPT_MODELS[1]) // gpt-5-mini as default
     }
   }, [selectedModel, setSelectedModel])
 

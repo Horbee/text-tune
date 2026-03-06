@@ -14,10 +14,10 @@ export class AppController {
     return { message: 'ML Service is running' }
   }
 
-  @Post('api/gec')
-  async postGec(@Body() gecInputDto: GecInputDto): Promise<GecResponseDto> {
-    this.logger.log(`Received GEC request with input: ${gecInputDto.text}`)
-    const { response } = await this.llmService.generateCorrection(gecInputDto.text)
+  @Post('api/generate-correction')
+  async postGenerateCorrection(@Body() gecInputDto: GecInputDto): Promise<GecResponseDto> {
+    this.logger.log(`Received GEC request with input: "${gecInputDto.text}" and model: "${gecInputDto.model}"`)
+    const { response } = await this.llmService.generateCorrection(gecInputDto.text, gecInputDto.model)
     return { corrected: response.trim(), original: gecInputDto.text }
   }
 }

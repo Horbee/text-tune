@@ -73,6 +73,7 @@ export const registerFrontendIPC = (configService: ConfigService, fixService: Fi
     ollamaModel: configService.getOllamaModel(),
     openAIModel: configService.getOpenAIModel(),
     textTuneServerUrl: configService.getTextTuneServerUrl(),
+    textTuneModel: configService.getTextTuneModel(),
     translateHistory: fixService.getHistory(),
   }))
 
@@ -87,5 +88,9 @@ export const registerFrontendIPC = (configService: ConfigService, fixService: Fi
 
   handleIPC('set-openai-model', async (_e, model: string | null) => {
     configService.setOpenAIModel(model)
+  })
+
+  handleIPC('set-text-tune-model', async (_e, model: string | null) => {
+    configService.setTextTuneModel(model)
   })
 }

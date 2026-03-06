@@ -7,14 +7,17 @@ export type BackendState = {
   ollamaModel: string | null
   openAIModel: string | null
   textTuneServerUrl: string | null
+  textTuneModel: string | null
   translateHistory: HistoryItem[]
 }
 
 export type HistoryItem = {
   id: number
-  type: 'original' | 'fix'
-  text: string
-  usedProvider?: WorkingMode
+  originalText: string
+  fixedText?: string
+  model: string
+  usedProvider: WorkingMode
+  isFixing: boolean
 }
 
 export type FixTextFn = (text: string, targetLang?: TargetLanguageCode) => Promise<string>

@@ -76,4 +76,8 @@ export class OpenAIProvider implements Provider {
       return 'An error occurred while fixing the text.'
     }
   }
+
+  getModel(): string | null {
+    return this.modelGetter()
+  }
 }

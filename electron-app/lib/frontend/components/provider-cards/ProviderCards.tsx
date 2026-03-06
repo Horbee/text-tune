@@ -34,6 +34,8 @@ export const ProviderCards = () => {
     textTuneServerUrl,
     saveTextTuneServerUrl,
     deleteTextTuneServerUrl,
+    selectedTextTuneModel,
+    setSelectedTextTuneModel,
   } = useBackendStore()
 
   return (
@@ -66,6 +68,8 @@ export const ProviderCards = () => {
             deleteTextTuneServerUrl={deleteTextTuneServerUrl}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
+            selectedModel={selectedTextTuneModel}
+            setSelectedModel={setSelectedTextTuneModel}
           />
         </Tabs.Panel>
 

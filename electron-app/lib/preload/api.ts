@@ -16,6 +16,7 @@ interface InvokeInterface {
   (channel: 'set-ollama-model', model: string | null): Promise<void>
   (channel: 'set-openai-model', model: string | null): Promise<void>
   (channel: 'save-text-tune-server-url', textTuneServerUrl: string): Promise<void>
+  (channel: 'set-text-tune-model', model: string | null): Promise<void>
   (channel: 'delete-text-tune-server-url'): Promise<void>
 }
 
