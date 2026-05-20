@@ -69,6 +69,14 @@ export const registerFrontendIPC = (
     }
   })
 
+  handleIPC('set-text-tune-server-url', async (_e, textTuneServerUrl: string) => {
+    try {
+      configService.setTextTuneServerUrl(textTuneServerUrl)
+    } catch (error) {
+      throw error
+    }
+  })
+
   handleIPC('delete-text-tune-server-url', async () => {
     try {
       configService.setTextTuneServerUrl(null)

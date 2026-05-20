@@ -37,7 +37,7 @@ export class TextTuneAIProvider implements Provider {
       return
     }
 
-    if (model === 'Text-Tune-Base') {
+    if (model === 'Text-Tune-Base-v13') {
       const url = this.textTuneServerUrlGetter()
       if (!url) {
         this.broadcastService.focusTextTuneUrlInput()
@@ -55,7 +55,7 @@ export class TextTuneAIProvider implements Provider {
       return this.localEngine.fix(text)
     }
 
-    if (model === 'Text-Tune-Base') {
+    if (model === 'Text-Tune-Base-v13') {
       const url = this.textTuneServerUrlGetter()
       if (!url) throw new Error('No Text Tune server URL configured')
       return this.remoteClient.fix(text, model, url)

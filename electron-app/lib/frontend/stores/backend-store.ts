@@ -67,6 +67,11 @@ export const useBackendStore = create<Store>()((set) => ({
       await window.api.invoke('set-text-tune-model', 'Text-Tune-Small')
     }
 
+    const textTuneServerUrl = backendState.textTuneServerUrl || 'http://localhost:3000'
+    if (!backendState.textTuneServerUrl) {
+      await window.api.invoke('set-text-tune-server-url', 'http://localhost:3000')
+    }
+
     set({
       deeplApiKeySaved,
       openAIApiKeySaved,
@@ -75,7 +80,7 @@ export const useBackendStore = create<Store>()((set) => ({
       selectedOllamaModel: backendState.ollamaModel,
       selectedOpenAIModel: backendState.openAIModel,
       fixHistory: backendState.translateHistory,
-      textTuneServerUrl: backendState.textTuneServerUrl,
+      textTuneServerUrl,
       selectedTextTuneModel: textTuneModel,
       modelDownloaded,
     })
