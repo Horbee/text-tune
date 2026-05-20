@@ -5,9 +5,13 @@ import { setFs, resetFs } from '@/test/helpers/fs-store'
 import { RegularConfigHelper, type AppConfig } from '@/lib/main/services/helpers/RegularConfigHelper'
 
 const defaults: AppConfig = {
-  workingMode: 'deepl', ollamaModel: null, openAIModel: null,
-  textTuneServerUrl: null, textTuneModel: null,
-  backgroundNotificationShown: false, lastWindowSize: null,
+  workingMode: 'tt-ai',
+  ollamaModel: null,
+  openAIModel: null,
+  textTuneServerUrl: null,
+  textTuneModel: null,
+  backgroundNotificationShown: false,
+  lastWindowSize: null,
 }
 
 describe('RegularConfigHelper', () => {
@@ -25,7 +29,12 @@ describe('RegularConfigHelper', () => {
     })
 
     it('parses valid JSON', () => {
-      const cfg = { ...defaults, workingMode: 'chatgpt', ollamaModel: 'llama3' as const, lastWindowSize: { width: 1200, height: 800 } }
+      const cfg = {
+        ...defaults,
+        workingMode: 'chatgpt',
+        ollamaModel: 'llama3' as const,
+        lastWindowSize: { width: 1200, height: 800 },
+      }
       setFs(helper['configPath'], JSON.stringify(cfg))
       expect(helper.load()).toEqual(cfg)
     })

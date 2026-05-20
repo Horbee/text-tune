@@ -24,7 +24,7 @@ export class RegularConfigHelper {
   load(): AppConfig {
     if (!fs.existsSync(this.configPath)) {
       const initialConfig: AppConfig = {
-        workingMode: 'deepl',
+        workingMode: 'tt-ai',
         ollamaModel: null,
         openAIModel: null,
         textTuneServerUrl: null,
@@ -40,7 +40,7 @@ export class RegularConfigHelper {
     } catch (err) {
       console.error('[RegularConfigHelper] Failed to parse config, returning defaults:', err)
       return {
-        workingMode: 'deepl',
+        workingMode: 'tt-ai',
         ollamaModel: null,
         openAIModel: null,
         textTuneServerUrl: null,

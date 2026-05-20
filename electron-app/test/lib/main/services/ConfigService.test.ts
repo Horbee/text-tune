@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setFs, resetFs } from '@/test/helpers/fs-store'
+import { resetFs } from '@/test/helpers/fs-store'
 import { safeStorage } from 'electron'
 import { ConfigService } from '@/lib/main/services/ConfigService'
 
@@ -11,7 +11,7 @@ describe('ConfigService', () => {
 
   it('starts with defaults', () => {
     const svc = new ConfigService()
-    expect(svc.getWorkingMode()).toBe('deepl')
+    expect(svc.getWorkingMode()).toBe('tt-ai')
     expect(svc.getOllamaModel()).toBeNull()
     expect(svc.getDeepLApiKey()).toBeNull()
     expect(svc.getLastWindowSize()).toBeNull()

@@ -135,8 +135,8 @@ export function initServices(): void {
 }
 
 export function createAppWindow(): void {
-  const width = configService.getLastWindowSize()?.width || 1020
-  const height = configService.getLastWindowSize()?.height || 700
+  const width = configService.getLastWindowSize()?.width || 1070
+  const height = configService.getLastWindowSize()?.height || 740
 
   const mainWindow = new BrowserWindow({
     width: width,
