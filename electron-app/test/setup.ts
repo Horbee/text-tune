@@ -1,0 +1,10 @@
+import './__mocks__/electron'
+import './__mocks__/app'
+import './__mocks__/fs'
+import './__mocks__/nut-js'
+import './__mocks__/utils'
+import './__mocks__/deepl'
+import './__mocks__/openai'
+import './__mocks__/text-tune-ai'
+import './__mocks__/axios'
+
