@@ -1,4 +1,9 @@
-{
+/**
+ * @see https://prettier.io/docs/configuration
+ * @type {import("prettier").Config}
+ */
+
+const config = {
   "singleQuote": true,
   "semi": false,
   "printWidth": 120,
@@ -8,4 +13,6 @@
   "proseWrap": "preserve",
   "quoteProps": "as-needed",
   "useTabs": false
-}
+};
+
+export default config;

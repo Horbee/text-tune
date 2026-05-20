@@ -1,6 +1,6 @@
 import { Translator, TargetLanguageCode } from 'deepl-node'
 
-import type { Provider } from './Provider'
+import type { Provider } from '@/lib/main/providers/Provider'
 import type { WorkingMode } from '@/lib/main/types'
 import type { NotificationService, LogService, BroadcastService } from '@/lib/main/services'
 

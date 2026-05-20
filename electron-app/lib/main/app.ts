@@ -14,8 +14,8 @@ import {
   PingService,
 } from './services'
 import { DeepLProvider, OllamaProvider, OpenAIProvider, TextTuneAIProvider } from './providers'
+import { ModelDownloader } from '@/lib/main/providers/helpers/ModelDownloader'
 
-// Service singletons (lightweight)
 let broadcastService: BroadcastService
 let logService: LogService
 let notificationService: NotificationService
@@ -24,6 +24,9 @@ let configService: ConfigService
 let pingService: PingService
 let fixService: FixService
 let errorHandler: ErrorHandler
+let modelDownloader: ModelDownloader
+
+export const getModelDownloader = () => modelDownloader
 
 export const fixCurrentLine = async () => {
   logService.debug('fixCurrentLine called')
@@ -80,8 +83,7 @@ export function createTray(): void {
 }
 
 export function registerAppIPC(): void {
-  // Register IPC events for the Frontend (now using services)
-  registerFrontendIPC(configService, fixService, pingService)
+  registerFrontendIPC(configService, fixService, pingService, modelDownloader, broadcastService)
 }
 
 export function getConfigService() {
@@ -89,7 +91,6 @@ export function getConfigService() {
 }
 
 export function initServices(): void {
-  // Initialize services
   broadcastService = new BroadcastService()
   logService = new LogService()
   notificationService = new NotificationService()
@@ -99,9 +100,11 @@ export function initServices(): void {
   errorHandler = new ErrorHandler(notificationService, logService)
   fixService = new FixService(configService.getWorkingMode(), broadcastService)
 
+  const cacheDir = join(app.getPath('userData'), 'Cache', 'Models')
+  modelDownloader = new ModelDownloader(cacheDir)
+
   logService.info('Services initialized')
 
-  // Register providers
   fixService.registerProvider(
     new DeepLProvider(() => configService.getDeepLApiKey(), notificationService, logService, broadcastService)
   )
@@ -121,6 +124,7 @@ export function initServices(): void {
     new TextTuneAIProvider(
       () => configService.getTextTuneModel(),
       () => configService.getTextTuneServerUrl(),
+      modelDownloader,
       notificationService,
       logService,
       broadcastService
@@ -141,7 +145,7 @@ export function createAppWindow(): void {
     icon: appIcon,
     title: 'Text Tune',
     webPreferences: {
-      preload: join(__dirname, '../preload/preload.js'),
+      preload: join(__dirname, '../preload/preload.cjs'),
       sandbox: false,
     },
   })

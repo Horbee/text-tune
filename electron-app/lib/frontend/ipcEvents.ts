@@ -1,13 +1,22 @@
 import { ipcMain } from 'electron'
+import fs from 'fs'
 import { ConfigService, PingService } from '@/lib//main/services'
 import type { FixService } from '@/lib/main/services'
 import type { WorkingMode } from '@/lib/main/types'
+import type { ModelDownloader } from '@/lib/main/providers/helpers/ModelDownloader'
+import type { BroadcastService } from '@/lib/main/services/BroadcastService'
 
 const handleIPC = (channel: string, handler: (...args: any[]) => void) => {
   ipcMain.handle(channel, handler)
 }
 
-export const registerFrontendIPC = (configService: ConfigService, fixService: FixService, pingService: PingService) => {
+export const registerFrontendIPC = (
+  configService: ConfigService,
+  fixService: FixService,
+  pingService: PingService,
+  modelDownloader: ModelDownloader,
+  broadcastService: BroadcastService
+) => {
   // DeepL Text Handlers
   handleIPC('save-deepl-api-key', (_e, deeplApiKey: string) => {
     try {
@@ -53,7 +62,7 @@ export const registerFrontendIPC = (configService: ConfigService, fixService: Fi
   // Text Tune AI Handlers
   handleIPC('save-text-tune-server-url', async (_e, textTuneServerUrl: string) => {
     try {
-      await pingService.ping<{ message: string }>(textTuneServerUrl) // Test the connection
+      await pingService.ping<{ message: string }>(textTuneServerUrl)
       configService.setTextTuneServerUrl(textTuneServerUrl)
     } catch (error) {
       throw error
@@ -65,6 +74,24 @@ export const registerFrontendIPC = (configService: ConfigService, fixService: Fi
       configService.setTextTuneServerUrl(null)
     } catch (error) {
       throw error
+    }
+  })
+
+  // Model Download Handlers
+  handleIPC('check-model-downloaded', async () => {
+    return modelDownloader.isDownloaded()
+  })
+
+  handleIPC('download-model', async () => {
+    await modelDownloader.ensureExists((percentage) => {
+      broadcastService.modelDownloadProgress(percentage)
+    })
+  })
+
+  handleIPC('delete-model', async () => {
+    const modelPath = modelDownloader.getModelPath()
+    if (fs.existsSync(modelPath)) {
+      fs.rmSync(modelPath, { force: true })
     }
   })
 

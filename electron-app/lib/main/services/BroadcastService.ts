@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron'
-import { IPCChannel, IPC_CHANNELS, FixSuccessPayload, ErrorPayload } from '../ipc/channels'
+import { IPCChannel, IPC_CHANNELS, FixSuccessPayload, ErrorPayload, ModelDownloadProgressPayload } from '../ipc/channels'
 
 export class BroadcastService {
   /**
@@ -44,5 +44,9 @@ export class BroadcastService {
    */
   focusTextTuneUrlInput(): void {
     this.send(IPC_CHANNELS.focusTextTuneUrlInput, undefined)
+  }
+
+  modelDownloadProgress(percentage: number): void {
+    this.send(IPC_CHANNELS.modelDownloadProgress, { percentage } satisfies ModelDownloadProgressPayload)
   }
 }

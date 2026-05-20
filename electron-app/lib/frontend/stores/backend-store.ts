@@ -26,10 +26,17 @@ type Store = {
   deleteDeeplApiKey: () => Promise<void>
   // Text Tune AI Config
   textTuneServerUrl: string | null
-  selectedTextTuneModel: string | null
-  setSelectedTextTuneModel: (model: string | null) => void
+  selectedTextTuneModel: string
+  setSelectedTextTuneModel: (model: string) => void
   saveTextTuneServerUrl: (textTuneServerUrl: string) => Promise<void>
   deleteTextTuneServerUrl: () => Promise<void>
+  // Model Download
+  modelDownloaded: boolean
+  modelDownloadProgress: number | null
+  isDownloading: boolean
+  checkModelDownloaded: () => Promise<void>
+  downloadModel: () => Promise<void>
+  deleteModel: () => Promise<void>
 }
 
 export const useBackendStore = create<Store>()((set) => ({
@@ -44,12 +51,21 @@ export const useBackendStore = create<Store>()((set) => ({
   chatgptApiKey: '',
   fixHistory: [],
   textTuneServerUrl: null,
-  selectedTextTuneModel: null,
+  selectedTextTuneModel: 'Text-Tune-Small',
+  modelDownloaded: false,
+  modelDownloadProgress: null,
+  isDownloading: false,
 
   initStore: async () => {
     const deeplApiKeySaved = await window.api.invoke('check-deepl-api-key')
     const openAIApiKeySaved = await window.api.invoke('check-openai-api-key')
     const backendState = await window.api.invoke('get-backend-state')
+    const modelDownloaded = await window.api.invoke('check-model-downloaded')
+
+    const textTuneModel = backendState.textTuneModel || 'Text-Tune-Small'
+    if (!backendState.textTuneModel) {
+      await window.api.invoke('set-text-tune-model', 'Text-Tune-Small')
+    }
 
     set({
       deeplApiKeySaved,
@@ -60,7 +76,8 @@ export const useBackendStore = create<Store>()((set) => ({
       selectedOpenAIModel: backendState.openAIModel,
       fixHistory: backendState.translateHistory,
       textTuneServerUrl: backendState.textTuneServerUrl,
-      selectedTextTuneModel: backendState.textTuneModel,
+      selectedTextTuneModel: textTuneModel,
+      modelDownloaded,
     })
   },
 
@@ -148,6 +165,28 @@ export const useBackendStore = create<Store>()((set) => ({
       showErrorNotification('Text Tune Server URL was not deleted!', 'Please try again.')
     }
   },
+  checkModelDownloaded: async () => {
+    const downloaded = await window.api.invoke('check-model-downloaded')
+    set({ modelDownloaded: downloaded })
+  },
+  downloadModel: async () => {
+    try {
+      set({ isDownloading: true, modelDownloadProgress: 0 })
+      await window.api.invoke('download-model')
+      set({ isDownloading: false, modelDownloaded: true, modelDownloadProgress: null })
+    } catch (error: any) {
+      set({ isDownloading: false, modelDownloadProgress: null })
+      showErrorNotification('Model download failed', error.message || 'Please try again.')
+    }
+  },
+  deleteModel: async () => {
+    try {
+      await window.api.invoke('delete-model')
+      set({ modelDownloaded: false, modelDownloadProgress: null })
+    } catch (error: any) {
+      showErrorNotification('Model deletion failed', error.message || 'Please try again.')
+    }
+  },
   setupListeners: () => {
     window.api.receive('fix-success', (payload) => {
       set({ fixHistory: payload.historyState })
@@ -156,9 +195,14 @@ export const useBackendStore = create<Store>()((set) => ({
     window.api.receive('error', (payload) => {
       showErrorNotification(payload.title, payload.message)
     })
+
+    window.api.receive('model-download-progress', (payload) => {
+      set({ modelDownloadProgress: payload.percentage })
+    })
   },
   cleanupListeners: () => {
     window.api.removeAllListeners('fix-success')
     window.api.removeAllListeners('error')
+    window.api.removeAllListeners('model-download-progress')
   },
 }))

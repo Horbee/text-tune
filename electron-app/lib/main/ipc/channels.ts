@@ -6,6 +6,7 @@ export const IPC_CHANNELS = {
   focusTextTuneUrlInput: 'focus-text-tune-url-input',
   focusApiKeyInput: 'focus-api-key-input',
   focusModelSelector: 'focus-model-selector',
+  modelDownloadProgress: 'model-download-progress',
 } as const
 
 export type IPCChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS]
@@ -17,4 +18,8 @@ export interface FixSuccessPayload {
 export interface ErrorPayload {
   title: string
   message: string
+}
+
+export interface ModelDownloadProgressPayload {
+  percentage: number
 }

@@ -31,9 +31,11 @@ export const ProviderCards = () => {
     deeplApiKeySaved,
     saveDeeplApiKey,
     deleteDeeplApiKey,
-    textTuneServerUrl,
-    saveTextTuneServerUrl,
-    deleteTextTuneServerUrl,
+    modelDownloaded,
+    modelDownloadProgress,
+    isDownloading,
+    downloadModel,
+    deleteModel,
     selectedTextTuneModel,
     setSelectedTextTuneModel,
   } = useBackendStore()
@@ -63,13 +65,15 @@ export const ProviderCards = () => {
 
         <Tabs.Panel value="tt-ai" className="mt-0" p="lg">
           <MotionTextTuneAIConfigManager
-            textTuneServerUrl={textTuneServerUrl}
-            saveTextTuneServerUrl={saveTextTuneServerUrl}
-            deleteTextTuneServerUrl={deleteTextTuneServerUrl}
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
             selectedModel={selectedTextTuneModel}
             setSelectedModel={setSelectedTextTuneModel}
+            modelDownloaded={modelDownloaded}
+            modelDownloadProgress={modelDownloadProgress}
+            isDownloading={isDownloading}
+            downloadModel={downloadModel}
+            deleteModel={deleteModel}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
           />
         </Tabs.Panel>
 

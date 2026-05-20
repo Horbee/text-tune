@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron'
 
 import type { BackendState, WorkingMode } from '@/lib/main/types'
-import type { ErrorPayload, FixSuccessPayload, IPCChannel } from '@/lib/main/ipc/channels'
+import type { ErrorPayload, FixSuccessPayload, IPCChannel, ModelDownloadProgressPayload } from '@/lib/main/ipc/channels'
 import { IPC_CHANNELS } from '@/lib/main/ipc/channels'
 
 interface InvokeInterface {
@@ -18,6 +18,9 @@ interface InvokeInterface {
   (channel: 'save-text-tune-server-url', textTuneServerUrl: string): Promise<void>
   (channel: 'set-text-tune-model', model: string | null): Promise<void>
   (channel: 'delete-text-tune-server-url'): Promise<void>
+  (channel: 'check-model-downloaded'): Promise<boolean>
+  (channel: 'download-model'): Promise<void>
+  (channel: 'delete-model'): Promise<void>
 }
 
 interface ReceiveInterface {
@@ -25,6 +28,7 @@ interface ReceiveInterface {
   (channel: typeof IPC_CHANNELS.error, callback: (args: ErrorPayload) => void): Function
   (channel: typeof IPC_CHANNELS.focusApiKeyInput, callback: () => void): Function
   (channel: typeof IPC_CHANNELS.focusModelSelector, callback: () => void): Function
+  (channel: typeof IPC_CHANNELS.modelDownloadProgress, callback: (args: ModelDownloadProgressPayload) => void): Function
 }
 
 const api = {
