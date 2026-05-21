@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Logger, Post } from '@nestjs/common'
 import { LlmService } from '@/llm/llm.service'
-import { GecInputDto } from '@/dto/gec-input.dto'
+import { type GecInputDto, gecInputSchema } from '@/dto/gec-input.dto'
 import { GecResponseDto } from '@/dto/gec-response.dto'
+import { ZodValidationPipe } from './pipes/zod-validation'
 
 @Controller()
 export class AppController {
@@ -15,7 +16,9 @@ export class AppController {
   }
 
   @Post('api/generate-correction')
-  async postGenerateCorrection(@Body() gecInputDto: GecInputDto): Promise<GecResponseDto> {
+  async postGenerateCorrection(
+    @Body(new ZodValidationPipe(gecInputSchema)) gecInputDto: GecInputDto
+  ): Promise<GecResponseDto> {
     this.logger.log(`Received GEC request with input: "${gecInputDto.text}" and model: "${gecInputDto.model}"`)
     const correctedText = await this.llmService.generateCorrection(gecInputDto.text, gecInputDto.model)
     return { corrected: correctedText.trim(), original: gecInputDto.text }
