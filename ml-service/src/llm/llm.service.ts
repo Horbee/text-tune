@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Ollama } from 'ollama'
-import { PrismaService } from '@/db/prisma.service'
+import { PrismaService } from '@/lib/prisma.service'
 import { z } from 'zod'
 
 export enum ModelName {

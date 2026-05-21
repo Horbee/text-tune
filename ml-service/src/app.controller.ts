@@ -3,6 +3,7 @@ import { LlmService } from '@/llm/llm.service'
 import { type GecInputDto, gecInputSchema } from '@/dto/gec-input.dto'
 import { GecResponseDto } from '@/dto/gec-response.dto'
 import { ZodValidationPipe } from './pipes/zod-validation'
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth'
 
 @Controller()
 export class AppController {
@@ -11,6 +12,7 @@ export class AppController {
   constructor(private readonly llmService: LlmService) {}
 
   @Get()
+  @AllowAnonymous()
   getHealth(): { message: string } {
     return { message: 'ML Service is running' }
   }

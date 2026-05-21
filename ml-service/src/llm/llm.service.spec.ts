@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { LlmService, ModelName } from './llm.service'
 import { Ollama } from 'ollama'
-import { PrismaService } from '../db/prisma.service'
+import { PrismaService } from '../lib/prisma.service'
 
 jest.mock('ollama')
 
