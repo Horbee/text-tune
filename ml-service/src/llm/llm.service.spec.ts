@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { LlmService } from './llm.service'
+import { LlmService, ModelName } from './llm.service'
 import { Ollama } from 'ollama'
 import { PrismaService } from '../db/prisma.service'
 
@@ -23,20 +23,20 @@ describe('LlmService', () => {
       const mockPrompt = 'This is a test sentense.'
       const mockResponse = {
         response: 'This is a test sentence.',
-        model: 'text-tune-ai',
+        model: ModelName.TextTuneBase,
         done: true,
       }
 
       mockOllama.generate = jest.fn().mockResolvedValue(mockResponse)
 
-      const result = await service.generateCorrection(mockPrompt)
+      const result = await service.generateCorrection(mockPrompt, ModelName.TextTuneBase)
 
       expect(mockOllama.generate).toHaveBeenCalledWith({
-        model: 'text-tune-ai',
+        model: ModelName.TextTuneBase,
         prompt: mockPrompt,
         stream: false,
       })
-      expect(result).toEqual(mockResponse)
+      expect(result).toEqual(mockResponse.response)
     })
   })
 })

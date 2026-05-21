@@ -17,7 +17,7 @@ export class AppController {
   @Post('api/generate-correction')
   async postGenerateCorrection(@Body() gecInputDto: GecInputDto): Promise<GecResponseDto> {
     this.logger.log(`Received GEC request with input: "${gecInputDto.text}" and model: "${gecInputDto.model}"`)
-    const { response } = await this.llmService.generateCorrection(gecInputDto.text, gecInputDto.model)
-    return { corrected: response.trim(), original: gecInputDto.text }
+    const correctedText = await this.llmService.generateCorrection(gecInputDto.text, gecInputDto.model)
+    return { corrected: correctedText.trim(), original: gecInputDto.text }
   }
 }
