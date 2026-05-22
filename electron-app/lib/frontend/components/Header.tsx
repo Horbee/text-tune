@@ -1,11 +1,13 @@
-import { ActionIcon, Box, Flex, Image, Text } from '@mantine/core'
-import { IoMdMenu } from 'react-icons/io'
+import { ActionIcon, Box, Flex, Image, Text, Tooltip } from '@mantine/core'
+import { IoMdMenu, IoMdLogOut } from 'react-icons/io'
+import { useAuthStore } from '@/lib/frontend/stores/auth-store'
 import { useDrawerStore } from '@/lib/frontend/stores/drawer-store'
 
 import appIcon from '@/resources/build/icon.png?asset'
 
 export function Header() {
   const { toggleDrawer } = useDrawerStore()
+  const { user, signOut } = useAuthStore()
 
   return (
     <Box
@@ -21,16 +23,32 @@ export function Header() {
           Text Tune
         </Text>
 
-        <ActionIcon
-          display={{ base: 'block', md: 'none' }}
-          variant="outline"
-          ml="auto"
-          size="lg"
-          color="gray"
-          onClick={toggleDrawer}
-        >
-          <IoMdMenu size={24} color="#eee" />
-        </ActionIcon>
+        <Flex align="center" gap="sm" ml="auto">
+          {user && (
+            <Text size="sm" c="dimmed" visibleFrom="xs">
+              {user.email}
+            </Text>
+          )}
+          <Tooltip label="Sign out" withArrow>
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              color="gray"
+              onClick={signOut}
+            >
+              <IoMdLogOut size={20} />
+            </ActionIcon>
+          </Tooltip>
+          <ActionIcon
+            display={{ base: 'block', md: 'none' }}
+            variant="outline"
+            size="lg"
+            color="gray"
+            onClick={toggleDrawer}
+          >
+            <IoMdMenu size={24} color="#eee" />
+          </ActionIcon>
+        </Flex>
       </Flex>
     </Box>
   )

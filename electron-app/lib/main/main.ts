@@ -10,6 +10,10 @@ import {
   getConfigService,
   createOrShowWindow,
 } from './app'
+import { authClient } from './auth-client'
+
+// Initialize the secure deep link handlers and IPC bridges
+authClient.setupMain()
 
 // Enable usage of Portal's globalShortcuts. This is essential for cases when
 // the app runs in a Wayland session.
@@ -42,6 +46,19 @@ if (!gotTheLock) {
     createTray()
     globalShortcut.register('F9', fixCurrentLine)
     globalShortcut.register('F10', fixSelection)
+
+    if (globalShortcut.isRegistered('F9')) {
+      console.log('F9 shortcut registered successfully')
+    } else {
+      console.error('Failed to register F9 shortcut')
+    }
+
+    if (globalShortcut.isRegistered('F10')) {
+      console.log('F10 shortcut registered successfully')
+    } else {
+      console.error('Failed to register F10 shortcut')
+    }
+
     // Default open or close DevTools by F12 in development
     // and ignore CommandOrControl + R in production.
     // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -80,9 +97,9 @@ if (!gotTheLock) {
   })
 
   app.on('will-quit', () => {
-  // Unregister all shortcuts.
-  globalShortcut.unregisterAll()
-})
+    // Unregister all shortcuts.
+    globalShortcut.unregisterAll()
+  })
 }
 
 // In this file, you can include the rest of your app's specific main process

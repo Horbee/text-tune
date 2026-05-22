@@ -4,6 +4,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { magicLink } from 'better-auth/plugins'
 import { PrismaService } from '@/lib/prisma.service'
 import { ResendService } from '@/lib/resend.service'
+import { electron } from '@better-auth/electron'
 
 export const createBetterAuthInstance = (prismaService: PrismaService, resendService: ResendService) => {
   const logger = new Logger('Auth')
@@ -12,17 +13,21 @@ export const createBetterAuthInstance = (prismaService: PrismaService, resendSer
     database: prismaAdapter(prismaService, {
       provider: 'sqlite',
     }),
-    emailAndPassword: {
-      enabled: true,
-    },
+    trustedOrigins: ['texttune:/'],
     plugins: [
+      electron(),
       magicLink({
         sendMagicLink: async ({ email, url }) => {
           const { data, error } = await resendService.emails.send({
             from: 'Text Tune AI <text-tune@horbee.live>',
             to: [email],
             subject: 'Login to Text Tune AI',
-            html: `<p>Click the link below to sign in:</p><p><a href="${url}">${url}</a></p>`,
+            template: {
+              id: '490b168b-c5b3-454b-8d5d-814ab3470652',
+              variables: {
+                magic_link_url: url,
+              },
+            },
           })
 
           if (error) {

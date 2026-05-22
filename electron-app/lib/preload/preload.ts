@@ -1,6 +1,9 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import api from './api'
+// Exposes window.requestAuth, window.signOut, etc.
+import { setupRenderer } from '@better-auth/electron/preload'
+setupRenderer()
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { showErrorNotification } from '@/lib/frontend/App'
+import { showErrorNotification } from '@/lib/frontend/utils/notifications'
 
 import type { HistoryItem, WorkingMode } from '@/lib/main/types'
 

@@ -22,6 +22,7 @@
     "download-model": "ts-node scripts/download-model.ts"
   },
   "dependencies": {
+    "@better-auth/electron": "^1.6.11",
     "@huggingface/hub": "^2.7.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",

@@ -147,6 +147,8 @@ export function createAppWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/preload.cjs'),
       sandbox: false,
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   })
 
