@@ -8,12 +8,21 @@ import { ResendService } from '@/lib/resend.service'
 import { createBetterAuthInstance } from '@/lib/auth'
 import { ConfigModule } from '@nestjs/config'
 import { AuthModule } from '@thallesp/nestjs-better-auth'
+import { ServeStaticModule } from '@nestjs/serve-static'
 import { LastActiveInterceptor } from './interceptors/last-active.interceptor'
 import { APP_INTERCEPTOR } from '@nestjs/core'
+import { join } from 'path'
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'public'),
+      serveRoot: '/',
+      serveStaticOptions: {
+        index: false,
+      },
+    }),
     PrismaModule,
     ResendModule,
     AuthModule.forRootAsync({
