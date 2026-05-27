@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Flex, Image, Text, Tooltip } from '@mantine/core'
+import { ActionIcon, Box, Button, Flex, Image, Text, Tooltip } from '@mantine/core'
 import { IoMdMenu, IoMdLogOut } from 'react-icons/io'
 import { useAuthStore } from '@/lib/frontend/stores/auth-store'
 import { useDrawerStore } from '@/lib/frontend/stores/drawer-store'
@@ -24,21 +24,25 @@ export function Header() {
         </Text>
 
         <Flex align="center" gap="sm" ml="auto">
-          {user && (
-            <Text size="sm" c="dimmed" visibleFrom="xs">
-              {user.email}
-            </Text>
+          {!user && (
+            <Button variant="outline" onClick={() => window.requestAuth()}>
+              Sign in
+            </Button>
           )}
-          <Tooltip label="Sign out" withArrow>
-            <ActionIcon
-              variant="subtle"
-              size="lg"
-              color="gray"
-              onClick={signOut}
-            >
-              <IoMdLogOut size={20} />
-            </ActionIcon>
-          </Tooltip>
+
+          {user && (
+            <>
+              <Text size="sm" c="dimmed" visibleFrom="xs">
+                {user.email}
+              </Text>
+              <Tooltip label="Sign out" withArrow>
+                <ActionIcon variant="subtle" size="lg" color="gray" onClick={signOut}>
+                  <IoMdLogOut size={20} />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          )}
+
           <ActionIcon
             display={{ base: 'block', md: 'none' }}
             variant="outline"

@@ -14,3 +14,5 @@ export const authClient = createAuthClient({
     magicLinkClient(),
   ],
 })
+
+export type AuthClient = typeof authClient

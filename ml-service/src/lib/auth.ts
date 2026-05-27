@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common'
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
-import { magicLink } from 'better-auth/plugins'
+import { magicLink, bearer } from 'better-auth/plugins'
 import { PrismaService } from '@/lib/prisma.service'
 import { ResendService } from '@/lib/resend.service'
 import { electron } from '@better-auth/electron'
@@ -13,8 +13,18 @@ export const createBetterAuthInstance = (prismaService: PrismaService, resendSer
     database: prismaAdapter(prismaService, {
       provider: 'sqlite',
     }),
+    logger: {
+      level: 'info',
+      log: (message) => logger.log(message),
+      error: (message, error) => logger.error(message, error),
+    },
+    onAPIError: {
+      throw: true,
+      onError: (error) => logger.error('Authentication API error', error),
+    },
     trustedOrigins: ['texttune:/'],
     plugins: [
+      bearer(),
       electron(),
       magicLink({
         sendMagicLink: async ({ email, url }) => {

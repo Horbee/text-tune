@@ -38,9 +38,6 @@ export const ProviderCards = () => {
     deleteModel,
     selectedTextTuneModel,
     setSelectedTextTuneModel,
-    textTuneServerUrl,
-    saveTextTuneServerUrl,
-    deleteTextTuneServerUrl,
   } = useBackendStore()
 
   return (
@@ -75,9 +72,6 @@ export const ProviderCards = () => {
             isDownloading={isDownloading}
             downloadModel={downloadModel}
             deleteModel={deleteModel}
-            textTuneServerUrl={textTuneServerUrl}
-            saveTextTuneServerUrl={saveTextTuneServerUrl}
-            deleteTextTuneServerUrl={deleteTextTuneServerUrl}
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
           />

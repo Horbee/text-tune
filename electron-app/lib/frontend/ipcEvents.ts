@@ -60,31 +60,6 @@ export const registerFrontendIPC = (
   })
 
   // Text Tune AI Handlers
-  handleIPC('save-text-tune-server-url', async (_e, textTuneServerUrl: string) => {
-    try {
-      await pingService.ping<{ message: string }>(textTuneServerUrl)
-      configService.setTextTuneServerUrl(textTuneServerUrl)
-    } catch (error) {
-      throw error
-    }
-  })
-
-  handleIPC('set-text-tune-server-url', async (_e, textTuneServerUrl: string) => {
-    try {
-      configService.setTextTuneServerUrl(textTuneServerUrl)
-    } catch (error) {
-      throw error
-    }
-  })
-
-  handleIPC('delete-text-tune-server-url', async () => {
-    try {
-      configService.setTextTuneServerUrl(null)
-    } catch (error) {
-      throw error
-    }
-  })
-
   // Model Download Handlers
   handleIPC('check-model-downloaded', async () => {
     return modelDownloader.isDownloaded()
@@ -107,7 +82,6 @@ export const registerFrontendIPC = (
     workingMode: configService.getWorkingMode(),
     ollamaModel: configService.getOllamaModel(),
     openAIModel: configService.getOpenAIModel(),
-    textTuneServerUrl: configService.getTextTuneServerUrl(),
     textTuneModel: configService.getTextTuneModel(),
     translateHistory: fixService.getHistory(),
   }))

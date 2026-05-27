@@ -1,8 +1,9 @@
 import { BrowserWindow, shell, app, Menu, Tray, nativeImage } from 'electron'
 import { join } from 'path'
+
 import { registerFrontendIPC } from '@/lib/frontend/ipcEvents'
 import appIcon from '@/resources/build/icon.png?asset'
-
+import { authClient } from './auth-client'
 import {
   BroadcastService,
   LogService,
@@ -45,6 +46,7 @@ export const fixSelection = async () => {
 
     await clipboardService.replaceSelection(result.fixed)
   } catch (err: any) {
+    console.log('TEST')
     errorHandler.general('fixSelection', err)
     broadcastService.error({ title: 'Fix Failed', message: err?.message || 'Unknown error' })
   }
@@ -123,7 +125,7 @@ export function initServices(): void {
   fixService.registerProvider(
     new TextTuneAIProvider(
       () => configService.getTextTuneModel(),
-      () => configService.getTextTuneServerUrl(),
+      () => authClient.getSession(),
       modelDownloader,
       notificationService,
       logService,

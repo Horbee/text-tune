@@ -9,7 +9,6 @@ export type AppConfig = {
   ollamaModel: string | null
   openAIModel: string | null
   textTuneModel: string | null
-  textTuneServerUrl: string | null
   backgroundNotificationShown: boolean
   lastWindowSize: { width: number; height: number } | null
 }
@@ -27,7 +26,6 @@ export class RegularConfigHelper {
         workingMode: 'tt-ai',
         ollamaModel: null,
         openAIModel: null,
-        textTuneServerUrl: null,
         textTuneModel: null,
         backgroundNotificationShown: false,
         lastWindowSize: null,
@@ -43,7 +41,6 @@ export class RegularConfigHelper {
         workingMode: 'tt-ai',
         ollamaModel: null,
         openAIModel: null,
-        textTuneServerUrl: null,
         textTuneModel: null,
         backgroundNotificationShown: false,
         lastWindowSize: null,

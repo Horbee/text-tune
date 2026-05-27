@@ -36,12 +36,6 @@ describe('ConfigService', () => {
       expect(svc.getOpenAIModel()).toBe('gpt-5')
     })
 
-    it('round-trips server url', () => {
-      const svc = new ConfigService()
-      svc.setTextTuneServerUrl('http://x:1')
-      expect(svc.getTextTuneServerUrl()).toBe('http://x:1')
-    })
-
     it('round-trips textTuneModel', () => {
       const svc = new ConfigService()
       svc.setTextTuneModel('Small')

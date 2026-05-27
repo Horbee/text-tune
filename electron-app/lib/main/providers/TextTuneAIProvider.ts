@@ -4,16 +4,20 @@ import type { NotificationService, LogService, BroadcastService } from '@/lib/ma
 import type { ModelDownloader } from '@/lib/main/providers/helpers/ModelDownloader'
 import { LocalInferenceEngine } from './tt-ai/LocalInferenceEngine'
 import { RemoteInferenceClient } from './tt-ai/RemoteInferenceClient'
+import { AuthClient } from '../auth-client'
+
+type AuthClientGetSession = AuthClient['getSession']
 
 export class TextTuneAIProvider implements Provider {
   readonly id: WorkingMode = 'tt-ai'
 
+  private readonly REMOTE_URL = 'http://localhost:3000'
   private localEngine: LocalInferenceEngine
   private remoteClient: RemoteInferenceClient
 
   constructor(
     private modelGetter: () => string | null,
-    private textTuneServerUrlGetter: () => string | null,
+    private sessionGetter: AuthClientGetSession,
     modelDownloader: ModelDownloader,
     notificationService: NotificationService,
     logService: LogService,
@@ -38,10 +42,9 @@ export class TextTuneAIProvider implements Provider {
     }
 
     if (model === 'Text-Tune-Base-v13') {
-      const url = this.textTuneServerUrlGetter()
-      if (!url) {
-        this.broadcastService.focusTextTuneUrlInput()
-        throw new Error('No Text Tune server URL configured')
+      const session = await this.sessionGetter()
+      if (!session.data) {
+        throw new Error('User must be logged in to use Text-Tune-Base')
       }
       return
     }
@@ -56,9 +59,9 @@ export class TextTuneAIProvider implements Provider {
     }
 
     if (model === 'Text-Tune-Base-v13') {
-      const url = this.textTuneServerUrlGetter()
-      if (!url) throw new Error('No Text Tune server URL configured')
-      return this.remoteClient.fix(text, model, url)
+      const session = await this.sessionGetter()
+      if (!session.data) throw new Error('User must be logged in to use Text-Tune-Base')
+      return this.remoteClient.fix(text, model, this.REMOTE_URL, session.data.session.token)
     }
 
     throw new Error(`Unknown model: ${model}`)

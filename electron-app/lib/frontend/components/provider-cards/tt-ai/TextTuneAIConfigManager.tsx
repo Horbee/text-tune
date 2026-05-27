@@ -7,19 +7,13 @@ import {
   Text,
   Button,
   Badge,
-  TextInput,
-  ActionIcon,
-  Flex,
-  Paper,
 } from '@mantine/core'
-import { FaDownload, FaCheck, FaTrashAlt } from 'react-icons/fa'
-import { IoMdCheckmarkCircleOutline } from 'react-icons/io'
-import { useInputFocus } from '@/lib/frontend/hooks/useInputFocus'
-import { hasLength, useForm } from '@mantine/form'
+import { FaDownload } from 'react-icons/fa'
+import { useDisclosure } from '@mantine/hooks'
 import { ConfirmDownloadModal } from './ConfirmDownloadModal'
 import { DownloadProgress } from './DownloadProgress'
 import { ModelStatus } from './ModelStatus'
-import { useDisclosure } from '@mantine/hooks'
+import { useAuthStore } from '@/lib/frontend/stores/auth-store'
 
 type Props = {
   selectedModel: string
@@ -29,9 +23,6 @@ type Props = {
   isDownloading: boolean
   downloadModel: () => Promise<void>
   deleteModel: () => Promise<void>
-  textTuneServerUrl: string | null
-  saveTextTuneServerUrl: (url: string) => Promise<void>
-  deleteTextTuneServerUrl: () => Promise<void>
 } & StackProps
 
 const selectedCardStyle = {
@@ -59,94 +50,14 @@ export const TextTuneAIConfigManager = ({
   isDownloading,
   downloadModel,
   deleteModel,
-  textTuneServerUrl,
-  saveTextTuneServerUrl,
-  deleteTextTuneServerUrl,
   ...props
 }: Props) => {
   const [confirmOpened, { open: openConfirm, close: closeConfirm }] = useDisclosure(false)
-  const urlInputRef = useInputFocus<HTMLInputElement>('focus-text-tune-url-input')
-
-  const form = useForm({
-    mode: 'controlled',
-    initialValues: { serverUrl: '' },
-    validate: {
-      serverUrl: hasLength({ min: 1 }, 'Must be at least 1 character'),
-    },
-  })
-
-  const submitUrl = (values: typeof form.values) => {
-    saveTextTuneServerUrl(values.serverUrl)
-    form.reset()
-  }
+  const { user } = useAuthStore()
+  const isLoggedIn = !!user
 
   const isSmallSelected = selectedModel === 'Text-Tune-Small'
   const isBaseSelected = !isSmallSelected
-  const urlSaved = !!textTuneServerUrl
-
-  const baseCardContent = () => {
-    if (!isBaseSelected) {
-      return (
-        <Text size="sm" c="dimmed">
-          {urlSaved ? `Server: ${textTuneServerUrl}` : 'No server configured'}
-        </Text>
-      )
-    }
-
-    if (urlSaved) {
-      return (
-        <Paper bg="var(--mantine-color-green-light)" p="md" withBorder bd="1px solid green.9">
-          <Flex gap="md" align="center" wrap="wrap">
-            <IoMdCheckmarkCircleOutline size={24} color="var(--mantine-color-green-6)" />
-            <Stack gap="0">
-              <Text fw={700} c="green.3">
-                Connected to {textTuneServerUrl}
-              </Text>
-              <Text c="green.6" size="sm">
-                You can now use the remote model.
-              </Text>
-            </Stack>
-            <Button
-              variant="outline"
-              size="compact-sm"
-              color="red"
-              ml="auto"
-              onClick={(e) => {
-                e.stopPropagation()
-                deleteTextTuneServerUrl()
-              }}
-              leftSection={<FaTrashAlt />}
-            >
-              Delete URL
-            </Button>
-          </Flex>
-        </Paper>
-      )
-    }
-
-    return (
-      <form
-        onSubmit={(e) => {
-          e.stopPropagation()
-          form.onSubmit(submitUrl)(e)
-        }}
-        style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
-      >
-        <Group align="end" gap="xs">
-          <TextInput
-            ref={urlInputRef}
-            label="Server URL"
-            placeholder="http://localhost:3000"
-            flex="1"
-            {...form.getInputProps('serverUrl')}
-          />
-          <ActionIcon type="submit" size={36}>
-            <FaCheck />
-          </ActionIcon>
-        </Group>
-      </form>
-    )
-  }
 
   return (
     <Stack gap="sm" {...props}>
@@ -208,7 +119,15 @@ export const TextTuneAIConfigManager = ({
                 Online
               </Badge>
             </Group>
-            {baseCardContent()}
+            {isBaseSelected && !isLoggedIn ? (
+              <Text size="sm" c="yellow" fw={600}>
+                You need to be logged in to use the remote model.
+              </Text>
+            ) : (
+              <Text size="sm" c={isBaseSelected ? undefined : 'dimmed'}>
+                Runs on the Text Tune remote server.
+              </Text>
+            )}
           </Stack>
         </Card>
       </Group>

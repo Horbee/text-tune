@@ -3,7 +3,6 @@ import { Drawer, Grid, Group, Stack, Title } from '@mantine/core'
 import { motion } from 'motion/react'
 
 import { Instructions, FixHistoryContainer, Header, ProviderCards } from '@/lib/frontend/components'
-import { LoginScreen } from '@/lib/frontend/components/auth/LoginScreen'
 import { useAuthStore } from '@/lib/frontend/stores/auth-store'
 import { useBackendStore } from '@/lib/frontend/stores/backend-store'
 import { useDrawerStore } from '@/lib/frontend/stores/drawer-store'
@@ -14,7 +13,7 @@ const MotionInstructions = motion.create(Instructions)
 function App() {
   const { initStore, setupListeners, cleanupListeners } = useBackendStore()
   const { drawerOpen, setDrawerOpen } = useDrawerStore()
-  const { user, isLoading, fetchSession } = useAuthStore()
+  const { fetchSession } = useAuthStore()
 
   useEffect(() => {
     fetchSession()
@@ -37,27 +36,14 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (!user) return
-
     initStore()
     setupListeners()
 
     return () => {
       cleanupListeners()
     }
-  }, [user])
+  }, [])
 
-  if (isLoading) {
-    console.log('Loading session...')
-    return null
-  }
-
-  if (!user) {
-    console.log('No user found, redirecting to login...')
-    return <LoginScreen />
-  }
-
-  console.log('User authenticated:', user)
   return (
     <>
       <Header />

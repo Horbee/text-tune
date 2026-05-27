@@ -8,7 +8,6 @@ const defaults: AppConfig = {
   workingMode: 'tt-ai',
   ollamaModel: null,
   openAIModel: null,
-  textTuneServerUrl: null,
   textTuneModel: null,
   backgroundNotificationShown: false,
   lastWindowSize: null,

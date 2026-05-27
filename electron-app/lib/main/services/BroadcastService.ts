@@ -39,13 +39,6 @@ export class BroadcastService {
     this.send(IPC_CHANNELS.focusModelSelector, undefined)
   }
 
-  /**
-   * Request the frontend to focus the TextTune server URL input
-   */
-  focusTextTuneUrlInput(): void {
-    this.send(IPC_CHANNELS.focusTextTuneUrlInput, undefined)
-  }
-
   modelDownloadProgress(percentage: number): void {
     this.send(IPC_CHANNELS.modelDownloadProgress, { percentage } satisfies ModelDownloadProgressPayload)
   }

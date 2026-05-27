@@ -6,7 +6,6 @@ export type BackendState = {
   workingMode: WorkingMode
   ollamaModel: string | null
   openAIModel: string | null
-  textTuneServerUrl: string | null
   textTuneModel: string | null
   translateHistory: HistoryItem[]
 }

@@ -6,7 +6,7 @@ import { BroadcastService } from '@/lib/main/services/BroadcastService'
 
 describe('TextTuneAIProvider', () => {
   let modelGetter: () => string | null
-  let textTuneServerUrlGetter: () => string | null
+  let sessionGetter: () => Promise<{ session: { token: string } } | null>
   let modelDownloader: any
   let notificationService: NotificationService
   let logService: LogService
@@ -16,14 +16,14 @@ describe('TextTuneAIProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     modelGetter = vi.fn()
-    textTuneServerUrlGetter = vi.fn()
+    sessionGetter = vi.fn().mockResolvedValue({ session: { token: 'fake' } })
     modelDownloader = {}
     notificationService = new NotificationService()
     logService = new LogService()
     broadcastService = new BroadcastService()
     provider = new TextTuneAIProvider(
       modelGetter,
-      textTuneServerUrlGetter,
+      sessionGetter,
       modelDownloader,
       notificationService,
       logService,
@@ -66,20 +66,17 @@ describe('TextTuneAIProvider', () => {
       expect(mockEng.ensureReady).not.toHaveBeenCalled()
     })
 
-    it('validates server URL for Base model', async () => {
+    it('validates session for Base model', async () => {
       vi.mocked(modelGetter).mockReturnValue('Text-Tune-Base-v13')
-      vi.mocked(textTuneServerUrlGetter).mockReturnValue('http://localhost:8080')
 
       await expect(provider.ensureReady()).resolves.toBeUndefined()
     })
 
-    it('throws when server URL missing for Base model', async () => {
+    it('throws when not logged in for Base model', async () => {
       vi.mocked(modelGetter).mockReturnValue('Text-Tune-Base-v13')
-      vi.mocked(textTuneServerUrlGetter).mockReturnValue(null)
-      const spy = vi.spyOn(broadcastService, 'focusTextTuneUrlInput')
+      vi.mocked(sessionGetter).mockResolvedValue(null)
 
-      await expect(provider.ensureReady()).rejects.toThrow('No Text Tune server URL configured')
-      expect(spy).toHaveBeenCalled()
+      await expect(provider.ensureReady()).rejects.toThrow('User must be logged in to use Text-Tune-Base')
     })
   })
 
@@ -98,14 +95,13 @@ describe('TextTuneAIProvider', () => {
 
     it('delegates to remote client for Base model', async () => {
       vi.mocked(modelGetter).mockReturnValue('Text-Tune-Base-v13')
-      vi.mocked(textTuneServerUrlGetter).mockReturnValue('http://srv:4000')
       const { RemoteInferenceClient } = await import('@/lib/main/providers/tt-ai/RemoteInferenceClient')
       const mockRc = (RemoteInferenceClient as any).mock.results[0]?.value
       mockRc.fix.mockResolvedValueOnce('remote fixed')
 
       const result = await provider.fix('input')
 
-      expect(mockRc.fix).toHaveBeenCalledWith('input', 'Text-Tune-Base-v13', 'http://srv:4000')
+      expect(mockRc.fix).toHaveBeenCalledWith('input', 'Text-Tune-Base-v13', 'http://localhost:3000')
       expect(result).toBe('remote fixed')
     })
 
@@ -119,10 +115,10 @@ describe('TextTuneAIProvider', () => {
       await expect(provider.fix('text')).rejects.toThrow('Unknown model: unknown-model')
     })
 
-    it('throws if Base model has no server URL', async () => {
+    it('throws if Base model with no session', async () => {
       vi.mocked(modelGetter).mockReturnValue('Text-Tune-Base-v13')
-      vi.mocked(textTuneServerUrlGetter).mockReturnValue(null)
-      await expect(provider.fix('text')).rejects.toThrow('No Text Tune server URL configured')
+      vi.mocked(sessionGetter).mockResolvedValue(null)
+      await expect(provider.fix('text')).rejects.toThrow('User must be logged in to use Text-Tune-Base')
     })
   })
 

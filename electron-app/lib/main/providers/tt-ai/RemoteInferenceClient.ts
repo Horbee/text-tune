@@ -12,12 +12,13 @@ export class RemoteInferenceClient {
     private logService: LogService
   ) {}
 
-  async fix(text: string, model: string, serverUrl: string): Promise<string> {
+  async fix(text: string, model: string, serverUrl: string, token?: string): Promise<string> {
     this.logService.info('[RemoteInferenceClient] Fixing text')
 
     try {
       const gecUrl = `${serverUrl}/api/generate-correction`
-      const response = await axios.post<TextTuneAIResponse>(gecUrl, { text, model })
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined
+      const response = await axios.post<TextTuneAIResponse>(gecUrl, { text, model }, { headers })
       return response.data.corrected
     } catch (error: any) {
       console.error('Error fixing text with RemoteInferenceClient:', error)

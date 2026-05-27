@@ -37,9 +37,9 @@ describe('registerFrontendIPC', () => {
     return { configService, fixService, pingService, modelDownloader, broadcastService }
   }
 
-  it('registers exactly 17 IPC handlers', () => {
+  it('registers exactly 14 IPC handlers', () => {
     setup()
-    expect(ipcMain.handle).toHaveBeenCalledTimes(17)
+    expect(ipcMain.handle).toHaveBeenCalledTimes(14)
   })
 
   describe('DeepL handlers', () => {
@@ -87,39 +87,6 @@ describe('registerFrontendIPC', () => {
     })
   })
 
-  describe('Text Tune AI handlers', () => {
-    it('save-text-tune-server-url pings then saves', async () => {
-      const { configService, pingService } = setup()
-      vi.mocked(pingService.ping).mockResolvedValueOnce({ data: { message: 'ok' }, status: 200 })
-
-      await invoke('save-text-tune-server-url', 'http://localhost:8080')
-
-      expect(pingService.ping).toHaveBeenCalledWith('http://localhost:8080')
-      expect(configService.getTextTuneServerUrl()).toBe('http://localhost:8080')
-    })
-
-    it('save-text-tune-server-url throws if ping fails', async () => {
-      const { configService, pingService } = setup()
-      vi.mocked(pingService.ping).mockRejectedValueOnce(new Error('Connection refused'))
-
-      await expect(invoke('save-text-tune-server-url', 'http://bad:1')).rejects.toThrow('Connection refused')
-      expect(configService.getTextTuneServerUrl()).toBeNull()
-    })
-
-    it('set-text-tune-server-url saves without ping', async () => {
-      const { configService } = setup()
-      await invoke('set-text-tune-server-url', 'http://direct:3000')
-      expect(configService.getTextTuneServerUrl()).toBe('http://direct:3000')
-    })
-
-    it('delete-text-tune-server-url nullifies url', async () => {
-      const { configService } = setup()
-      configService.setTextTuneServerUrl('http://old:8080')
-      await invoke('delete-text-tune-server-url')
-      expect(configService.getTextTuneServerUrl()).toBeNull()
-    })
-  })
-
   describe('model download handlers', () => {
     it('check-model-downloaded delegates', async () => {
       const { modelDownloader } = setup()
@@ -161,12 +128,10 @@ describe('registerFrontendIPC', () => {
       const { configService } = setup()
       configService.setWorkingMode('chatgpt')
       configService.setOllamaModel('phi3')
-      configService.setTextTuneServerUrl('http://s:1')
 
       const state = invoke('get-backend-state')
       expect(state.workingMode).toBe('chatgpt')
       expect(state.ollamaModel).toBe('phi3')
-      expect(state.textTuneServerUrl).toBe('http://s:1')
       expect(state.translateHistory).toEqual([])
     })
   })

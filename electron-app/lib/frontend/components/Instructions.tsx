@@ -3,14 +3,17 @@ import { AnimatePresence, motion } from 'motion/react'
 import { FaCheck, FaTimesCircle, FaKeyboard } from 'react-icons/fa'
 import { useBackendStore } from '@/lib/frontend/stores/backend-store'
 
+import { useAuthStore } from '@/lib/frontend/stores/auth-store'
+
 export const Instructions = () => {
-  const { workingMode, deeplApiKeySaved, ollamaModelSelected, openAIApiKeySaved, textTuneServerUrl } = useBackendStore()
+  const { workingMode, deeplApiKeySaved, ollamaModelSelected, openAIApiKeySaved } = useBackendStore()
+  const { user } = useAuthStore()
 
   const readyToFix =
     (workingMode === 'deepl' && deeplApiKeySaved) ||
     (workingMode === 'ollama' && ollamaModelSelected) ||
     (workingMode === 'chatgpt' && openAIApiKeySaved) ||
-    (workingMode === 'tt-ai' && !!textTuneServerUrl)
+    (workingMode === 'tt-ai' && !!user)
 
   return (
     <Stack gap="sm">

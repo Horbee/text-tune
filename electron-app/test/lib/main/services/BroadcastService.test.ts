@@ -41,11 +41,6 @@ describe('BroadcastService', () => {
     expect(mockWebContents.send).toHaveBeenCalledWith('focus-model-selector', undefined)
   })
 
-  it('sends focusTextTuneUrlInput to all renderer windows', () => {
-    service.focusTextTuneUrlInput()
-    expect(mockWebContents.send).toHaveBeenCalledWith('focus-text-tune-url-input', undefined)
-  })
-
   it('sends modelDownloadProgress to all renderer windows', () => {
     service.modelDownloadProgress(42)
     expect(mockWebContents.send).toHaveBeenCalledWith('model-download-progress', { percentage: 42 })
