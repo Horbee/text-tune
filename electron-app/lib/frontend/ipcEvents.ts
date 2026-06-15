@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 import fs from 'fs'
-import { ConfigService, PingService } from '@/lib//main/services'
+import axios from 'axios'
+import { ConfigService } from '@/lib//main/services'
 import type { FixService } from '@/lib/main/services'
 import type { WorkingMode } from '@/lib/main/types'
 import type { ModelDownloader } from '@/lib/main/providers/helpers/ModelDownloader'
@@ -13,7 +14,6 @@ const handleIPC = (channel: string, handler: (...args: any[]) => void) => {
 export const registerFrontendIPC = (
   configService: ConfigService,
   fixService: FixService,
-  pingService: PingService,
   modelDownloader: ModelDownloader,
   broadcastService: BroadcastService
 ) => {
@@ -101,5 +101,10 @@ export const registerFrontendIPC = (
 
   handleIPC('set-text-tune-model', async (_e, model: string | null) => {
     configService.setTextTuneModel(model)
+  })
+
+  handleIPC('get-ollama-models', async () => {
+    const res = await axios.get('http://localhost:11434/api/tags')
+    return res.data.models.map((model: any) => model.name) as string[]
   })
 }

@@ -1,13 +1,13 @@
 {
   "name": "text-tune",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "A modern Electron application that fixes text in your clipboard",
   "main": "./out/main/main.js",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Horbee/texttune"
+    "url": "https://github.com/Horbee/text-tune"
   },
   "author": {
     "name": "Horbee",

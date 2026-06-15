@@ -7,7 +7,6 @@ import { registerFrontendIPC } from '@/lib/frontend/ipcEvents'
 import { ConfigService } from '@/lib/main/services'
 import { FixService } from '@/lib/main/services/FixService'
 import { BroadcastService } from '@/lib/main/services/BroadcastService'
-import type { PingService } from '@/lib/main/services/PingService'
 import type { ModelDownloader } from '@/lib/main/providers/helpers/ModelDownloader'
 
 describe('registerFrontendIPC', () => {
@@ -17,7 +16,7 @@ describe('registerFrontendIPC', () => {
     return handler({} as any, ...args)
   }
 
-  function setup(overrides?: { pingFn?: () => Promise<any> }) {
+  function setup() {
     resetFs()
     resetIPCHandlers()
     vi.clearAllMocks()
@@ -25,21 +24,20 @@ describe('registerFrontendIPC', () => {
     const configService = new ConfigService()
     const broadcastService = new BroadcastService()
     const fixService = new FixService('deepl', broadcastService)
-    const pingService = { ping: vi.fn() } as unknown as PingService
     const modelDownloader = {
       getModelPath: vi.fn().mockReturnValue('/tmp/models/test.gguf'),
       isDownloaded: vi.fn().mockReturnValue(false),
       ensureExists: vi.fn().mockResolvedValue('/tmp/models/test.gguf'),
     } as unknown as ModelDownloader
 
-    registerFrontendIPC(configService, fixService, pingService, modelDownloader, broadcastService)
+    registerFrontendIPC(configService, fixService, modelDownloader, broadcastService)
 
-    return { configService, fixService, pingService, modelDownloader, broadcastService }
+    return { configService, fixService, modelDownloader, broadcastService }
   }
 
-  it('registers exactly 14 IPC handlers', () => {
+  it('registers exactly 15 IPC handlers', () => {
     setup()
-    expect(ipcMain.handle).toHaveBeenCalledTimes(14)
+    expect(ipcMain.handle).toHaveBeenCalledTimes(15)
   })
 
   describe('DeepL handlers', () => {

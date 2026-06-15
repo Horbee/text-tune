@@ -10,6 +10,16 @@ export const IPC_CHANNELS = {
 
 export type IPCChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS]
 
+export const IPC_INVOKE_CHANNELS = {
+  getOllamaModels: 'get-ollama-models',
+} as const
+
+export type IPCInvokeChannel = (typeof IPC_INVOKE_CHANNELS)[keyof typeof IPC_INVOKE_CHANNELS]
+
+export interface GetOllamaModelsPayload {
+  models: string[]
+}
+
 export interface FixSuccessPayload {
   historyState: HistoryItem[]
 }

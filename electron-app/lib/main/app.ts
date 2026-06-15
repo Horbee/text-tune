@@ -12,7 +12,6 @@ import {
   ConfigService,
   ErrorHandler,
   FixService,
-  PingService,
 } from './services'
 import { DeepLProvider, OllamaProvider, OpenAIProvider, TextTuneAIProvider } from './providers'
 import { ModelDownloader } from '@/lib/main/providers/helpers/ModelDownloader'
@@ -22,7 +21,6 @@ let logService: LogService
 let notificationService: NotificationService
 let clipboardService: ClipboardService
 let configService: ConfigService
-let pingService: PingService
 let fixService: FixService
 let errorHandler: ErrorHandler
 let modelDownloader: ModelDownloader
@@ -85,7 +83,7 @@ export function createTray(): void {
 }
 
 export function registerAppIPC(): void {
-  registerFrontendIPC(configService, fixService, pingService, modelDownloader, broadcastService)
+  registerFrontendIPC(configService, fixService, modelDownloader, broadcastService)
 }
 
 export function getConfigService() {
@@ -98,7 +96,6 @@ export function initServices(): void {
   notificationService = new NotificationService()
   clipboardService = new ClipboardService()
   configService = new ConfigService()
-  pingService = new PingService()
   errorHandler = new ErrorHandler(notificationService, logService)
   fixService = new FixService(configService.getWorkingMode(), broadcastService)
 

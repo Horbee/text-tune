@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron'
 
 import type { BackendState, WorkingMode } from '@/lib/main/types'
-import type { ErrorPayload, FixSuccessPayload, IPCChannel, ModelDownloadProgressPayload } from '@/lib/main/ipc/channels'
+import type { ErrorPayload, FixSuccessPayload, IPCChannel, IPCInvokeChannel, ModelDownloadProgressPayload } from '@/lib/main/ipc/channels'
 import { IPC_CHANNELS } from '@/lib/main/ipc/channels'
 
 interface InvokeInterface {
@@ -19,6 +19,7 @@ interface InvokeInterface {
   (channel: 'check-model-downloaded'): Promise<boolean>
   (channel: 'download-model'): Promise<void>
   (channel: 'delete-model'): Promise<void>
+  (channel: 'get-ollama-models'): Promise<string[]>
 }
 
 interface ReceiveInterface {

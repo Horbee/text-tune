@@ -1,8 +1,8 @@
 import { Alert, Select, Stack, Title, Text, Code, type StackProps } from '@mantine/core'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { GoAlert } from 'react-icons/go'
 import { useInputFocus } from '@/lib/frontend/hooks/useInputFocus'
-import axios from 'axios'
+import { useBackendStore } from '@/lib/frontend/stores/backend-store'
 
 type Props = {
   selectedModel: string | null
@@ -10,26 +10,15 @@ type Props = {
 } & StackProps
 
 export const OllamaConfigManager = ({ selectedModel, setSelectedModel, ...props }: Props) => {
-  const [models, setModels] = useState<string[]>([])
-  const [ollamaError, setOllamaError] = useState(false)
+  const ollamaModels = useBackendStore((store) => store.ollamaModels)
+  const ollamaError = useBackendStore((store) => store.ollamaError)
+  const isLoadingOllamaModels = useBackendStore((store) => store.isLoadingOllamaModels)
+  const fetchOllamaModels = useBackendStore((store) => store.fetchOllamaModels)
 
   const modelSelectorRef = useInputFocus<HTMLInputElement>('focus-model-selector')
 
-  const getOllamaData = async () => {
-    // Check if ollama is running
-    try {
-      await axios.get('http://localhost:11434')
-
-      // Get models
-      const res = await axios.get('http://localhost:11434/api/tags')
-      setModels(res.data.models.map((model: any) => model.name))
-    } catch (error) {
-      setOllamaError(true)
-    }
-  }
-
   useEffect(() => {
-    getOllamaData()
+    fetchOllamaModels()
   }, [])
 
   return (
@@ -41,7 +30,14 @@ export const OllamaConfigManager = ({ selectedModel, setSelectedModel, ...props 
       ) : (
         <>
           <Title order={3}>Select one of the available models</Title>
-          <Select ref={modelSelectorRef} data={models} value={selectedModel} onChange={setSelectedModel} clearable />
+          <Select
+            ref={modelSelectorRef}
+            data={ollamaModels}
+            value={selectedModel}
+            onChange={setSelectedModel}
+            clearable
+            disabled={isLoadingOllamaModels}
+          />
 
           <Alert>
             <Text>

@@ -34,6 +34,11 @@ type Store = {
   checkModelDownloaded: () => Promise<void>
   downloadModel: () => Promise<void>
   deleteModel: () => Promise<void>
+  // Ollama model discovery
+  ollamaModels: string[]
+  ollamaError: boolean
+  isLoadingOllamaModels: boolean
+  fetchOllamaModels: () => Promise<void>
 }
 
 export const useBackendStore = create<Store>()((set) => ({
@@ -51,6 +56,9 @@ export const useBackendStore = create<Store>()((set) => ({
   modelDownloaded: false,
   modelDownloadProgress: null,
   isDownloading: false,
+  ollamaModels: [],
+  ollamaError: false,
+  isLoadingOllamaModels: false,
 
   initStore: async () => {
     const deeplApiKeySaved = await window.api.invoke('check-deepl-api-key')
@@ -162,6 +170,15 @@ export const useBackendStore = create<Store>()((set) => ({
       set({ modelDownloaded: false, modelDownloadProgress: null })
     } catch (error: any) {
       showErrorNotification('Model deletion failed', error.message || 'Please try again.')
+    }
+  },
+  fetchOllamaModels: async () => {
+    try {
+      set({ isLoadingOllamaModels: true, ollamaError: false })
+      const models = await window.api.invoke('get-ollama-models')
+      set({ ollamaModels: models, ollamaError: false, isLoadingOllamaModels: false })
+    } catch {
+      set({ ollamaModels: [], ollamaError: true, isLoadingOllamaModels: false })
     }
   },
   setupListeners: () => {
